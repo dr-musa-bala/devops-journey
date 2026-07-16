@@ -96,9 +96,9 @@ A key part of engineering is documenting the iteration loop. Below is the visual
 #### ❌ 1. The Emoji Encoding Bug (Before)
 *The baseline deployment encountered a classic "Mojibake" character transformation issue. The Nginx server was rendering raw text without explicitly instructing the client browser to interpret modern UTF-8 emoji characters.*
 
-<img src="sillypets-bug.png" alt="SillyPets Bug Deployment" width="700">
+<img src="https://github.com/dr-musa-bala/devops-journey/blob/main/sillypets-bug.png" alt="SillyPets Bug Deployment" width="700">
 
 #### 🐳 2. The UTF-8 Hot Swap Resolution (After)
 *The resolution: Successfully injected a `<meta charset="UTF-8">` tag into the application's layout header, re-baked the Docker image payload, and hot-swapped the isolated container instance to port 8081.*
 
-<img src="sillypets-fixed.png" alt="SillyPets Fixed Deployment" width="700">
+<img src="https://github.com/dr-musa-bala/devops-journey/blob/main/sillypets-fixed.png" alt="SillyPets Fixed Deployment" width="700">
