@@ -88,3 +88,8 @@ git config --global --add safe.directory '*'
 ```bash
 docker rm -f sillypets-container
 docker run -d -p 8081:80 --name sillypets-container sillypets-image
+
+### 🖼️ Evidence of Deployment
+Here is the live web application running successfully out of the container:
+
+![SillyPets Live Deployment](sillypets-screenshot.png)
