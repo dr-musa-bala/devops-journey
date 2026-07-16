@@ -89,6 +89,7 @@ git config --global --add safe.directory '*'
 docker rm -f sillypets-container
 docker run -d -p 8081:80 --name sillypets-container sillypets-image
 
+```
 
 ### 🖼️ Project Evolution & Visual Evidence
 
