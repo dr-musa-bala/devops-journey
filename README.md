@@ -104,3 +104,41 @@ A key part of engineering is documenting the iteration loop. Below is the visual
 *The resolution: Successfully injected a `<meta charset="UTF-8">` tag into the application's layout header, re-baked the Docker image payload, and hot-swapped the isolated container instance to port 8081.*
 
 <img src="https://github.com/dr-musa-bala/devops-journey/raw/main/sillypets-fixed.png" alt="SillyPets Fixed Deployment" width="700">
+```
+
+### ☁️ Cloud Distribution & Container Registry (Docker Hub)
+
+To transition the application from a localized development environment to a globally accessible cloud footprint, the containerized image was published to **Docker Hub** (an enterprise-grade public container registry). This ensures the application blueprint is immutable, versioned, and deployable on any cloud infrastructure worldwide.
+
+#### 1. Authentication & Local Handshake
+Established a secure CLI session from the local Ubuntu instance to the remote container registry registry:
+```bash
+docker login
+
+```
+
+#### 2. Image Tagging & Semantic Versioning
+
+Abstracted the local build target (`sillypets-image`) into a globally unique registry path using an explicit repository namespace and a `V1.0` release tag to prevent configuration drift:
+
+```bash
+# Syntax: docker tag local-image username/repository:tag
+docker tag sillypets-image musabalaaudu/sillypets-image:V1.0
+
+```
+
+#### 3. Image Push & Registry Uplink
+
+Transferred the locally baked image layers up to the central cloud storage repository:
+
+```bash
+docker push musabalaaudu/sillypets-image:V1.0
+
+```
+
+#### 🌐 Global Verification & Execution
+
+The application can now be fetched from the internet and instantiated on any Docker-enabled target machine with a single, highly optimized runtime instruction—bypassing the need for local source code duplication entirely:
+
+```bash
+docker run -d -p 8081:80 --name cloud-sillypets musabalaaudu/sillypets-image:V1.0
