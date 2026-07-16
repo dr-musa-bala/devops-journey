@@ -89,10 +89,6 @@ git config --global --add safe.directory '*'
 docker rm -f sillypets-container
 docker run -d -p 8081:80 --name sillypets-container sillypets-image
 
-### 🖼️ Evidence of Deployment
-Here is the live web application running successfully out of the container:
-
-
 ### 🖼️ Project Evolution & Visual Evidence
 
 A key part of engineering is documenting the iteration loop. Below is the visual progression of identifying, debugging, and solving the text-encoding challenge:
@@ -100,9 +96,9 @@ A key part of engineering is documenting the iteration loop. Below is the visual
 #### ❌ 1. The Emoji Encoding Bug (Before)
 *The baseline deployment encountered a classic "Mojibake" character transformation issue. The Nginx server was rendering raw text without explicitly instructing the client browser to interpret modern UTF-8 emoji characters.*
 
-![SillyPets Bug Deployment](sillypets-bug.png)
+<img src="sillypets-bug.png" alt="SillyPets Bug Deployment" width="700">
 
-####  2. The UTF-8 Hot Swap Resolution (After)
+#### 🐳 2. The UTF-8 Hot Swap Resolution (After)
 *The resolution: Successfully injected a `<meta charset="UTF-8">` tag into the application's layout header, re-baked the Docker image payload, and hot-swapped the isolated container instance to port 8081.*
 
-![SillyPets Fixed Deployment](sillypets-fixed.png)
+<img src="sillypets-fixed.png" alt="SillyPets Fixed Deployment" width="700">
