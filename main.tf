@@ -56,16 +56,58 @@ resource "aws_subnet" "public_subnet" {
   }
 }
 
-# 3. Provision a Virtual Compute Server (EC2) inside our Subnet
+# 1. Firewall Rule Profile: Open Ingress for Web Gateways
+resource "aws_security_group" "web_firewall" {
+  name        = "${var.project_name}-${var.environment}-web-sg"
+  description = "Allow inbound HTTP web traffic"
+  vpc_id      = aws_vpc.main_vpc.id
+
+  # Open HTTP Port 80 to the public world
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow the server to download packages out to the internet
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# 2. Upgraded Virtual Server with Automated Docker Bootstrapping
 resource "aws_instance" "web_server" {
-  ami           = "ami-12345678" # A mock AMI ID for our local emulator
-  instance_type = "t3.micro"
-  subnet_id     = aws_subnet.public_subnet.id # Drops the server directly into our new network room
+  ami                    = "ami-12345678" # Mock AMI schema for local runtime
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public_subnet.id
+  vpc_security_group_ids = [aws_security_group.web_firewall.id] # Attaches the firewall profile
+
+  # The Automated Bootstrap Script Execution Layer
+  user_data = <<-EOF
+              #!/bin/bash
+              # Update package manager mirrors
+              apt-get update -y
+              
+              # Install the core Docker runtime daemon
+              apt-get install docker.io -y
+              
+              # Boot up the docker service engine
+              systemctl start docker
+              systemctl enable docker
+              
+              # Reach out to Docker Hub, pull the app, and map port 80
+              docker run -d --name sillypets-app -p 80:80 nginx:alpine
+              EOF
 
   tags = {
     Name = "${var.project_name}-${var.environment}-web-server"
   }
 }
+  
 # 2. Output the bucket creation confirmation
 output "bucket_name" {
   value       = aws_s3_bucket.local_bucket.id
