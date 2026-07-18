@@ -5,9 +5,28 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  # 🛑 BOOTSTRAP PHASE: Keep backend completely commented out until buckets are built
+  backend "s3" {
+    bucket       = "musa-devops-sillypets-state-bucket"
+    key          = "global/s3/terraform.tfstate"
+    region       = "us-east-1"
+    encrypt      = true
+    use_lockfile = true
+
+    endpoints = {
+      s3 = "http://localhost:4566"
+    }
+
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    skip_requesting_account_id  = true
+    use_path_style              = true
+  }
 }
 
-# Override default AWS settings to target Floci's local endpoints
+# 🌐 Local Emulator Routing Grid (Fully Active)
 provider "aws" {
   region                      = "us-east-1"
   access_key                  = "mock_key"
@@ -15,13 +34,14 @@ provider "aws" {
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
+  s3_use_path_style           = true
 
- s3_use_path_style             = true
-  # Redirect all cloud resource requests to localhost
   endpoints {
-    s3  = "http://localhost:4566"
-    ec2 = "http://localhost:4566"
-    iam = "http://localhost:4566"
+    s3       = "http://localhost:4566"
+    ec2      = "http://localhost:4566"
+    iam      = "http://localhost:4566"
+    dynamodb = "http://localhost:4566"
+    sts      = "http://localhost:4566"
   }
 }
 
@@ -47,7 +67,7 @@ resource "aws_vpc" "main_vpc" {
 
 # 2. Create a Public Subnet inside our VPC for the Web Server
 resource "aws_subnet" "public_subnet" {
-  vpc_id                  = aws_vpc.main_vpc.id # Links this subnet directly to our VPC above
+  vpc_id                  = aws_vpc.main_vpc.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
 
@@ -62,7 +82,6 @@ resource "aws_security_group" "web_firewall" {
   description = "Allow inbound HTTP web traffic"
   vpc_id      = aws_vpc.main_vpc.id
 
-  # Open HTTP Port 80 to the public world
   ingress {
     from_port   = 80
     to_port     = 80
@@ -70,7 +89,6 @@ resource "aws_security_group" "web_firewall" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow the server to download packages out to the internet
   egress {
     from_port   = 0
     to_port     = 0
@@ -81,25 +99,17 @@ resource "aws_security_group" "web_firewall" {
 
 # 2. Upgraded Virtual Server with Automated Docker Bootstrapping
 resource "aws_instance" "web_server" {
-  ami                    = "ami-12345678" # Mock AMI schema for local runtime
+  ami                    = "ami-12345678"
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public_subnet.id
-  vpc_security_group_ids = [aws_security_group.web_firewall.id] # Attaches the firewall profile
+  vpc_security_group_ids = [aws_security_group.web_firewall.id]
 
-  # The Automated Bootstrap Script Execution Layer
   user_data = <<-EOF
               #!/bin/bash
-              # Update package manager mirrors
               apt-get update -y
-              
-              # Install the core Docker runtime daemon
               apt-get install docker.io -y
-              
-              # Boot up the docker service engine
               systemctl start docker
               systemctl enable docker
-              
-              # Reach out to Docker Hub, pull the app, and map port 80
               docker run -d --name sillypets-app -p 80:80 nginx:alpine
               EOF
 
@@ -107,9 +117,38 @@ resource "aws_instance" "web_server" {
     Name = "${var.project_name}-${var.environment}-web-server"
   }
 }
-  
+
 # 2. Output the bucket creation confirmation
 output "bucket_name" {
   value       = aws_s3_bucket.local_bucket.id
   description = "The name of your newly emulated local S3 bucket"
+}
+
+# 🪣 The Central S3 Storage Bucket for State Files (Fully Active!)
+resource "aws_s3_bucket" "state_storage" {
+  bucket        = "musa-devops-sillypets-state-bucket"
+  force_destroy = true
+}
+
+# Enforce encryption on our state files for security
+resource "aws_s3_bucket_server_side_encryption_configuration" "state_crypto" {
+  bucket = aws_s3_bucket.state_storage.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+# 2. The DynamoDB State Locking Table
+resource "aws_dynamodb_table" "state_locks" {
+  name         = "sillypets-infrastructure-locks"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
 }
