@@ -1,0 +1,27 @@
+name: Terraform Code Quality Guard
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  validate-infrastructure:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Initialize Workspace
+        run: terraform init -backend=false
+
+      - name: Verify Code Formatting
+        run: terraform fmt -check
+
+      - name: Validate Syntax Structure
+        run: terraform validate
