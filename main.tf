@@ -33,6 +33,39 @@ resource "aws_s3_bucket" "local_bucket" {
 resource "aws_s3_bucket" "profile_pictures" {
   bucket = "${var.project_name}-${var.environment}-user-profiles"
 }
+
+# 1. Create the Virtual Private Cloud (Network Border)
+resource "aws_vpc" "main_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-vpc"
+    Environment = var.environment
+  }
+}
+
+# 2. Create a Public Subnet inside our VPC for the Web Server
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.main_vpc.id # Links this subnet directly to our VPC above
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-public-subnet"
+  }
+}
+
+# 3. Provision a Virtual Compute Server (EC2) inside our Subnet
+resource "aws_instance" "web_server" {
+  ami           = "ami-12345678" # A mock AMI ID for our local emulator
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.public_subnet.id # Drops the server directly into our new network room
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-web-server"
+  }
+}
 # 2. Output the bucket creation confirmation
 output "bucket_name" {
   value       = aws_s3_bucket.local_bucket.id

@@ -216,3 +216,10 @@ resource "aws_s3_bucket" "local_bucket" {
 resource "aws_s3_bucket" "profile_pictures" {
   bucket = "${var.project_name}-${var.environment}-user-profiles"
 }
+```
+### 🌐 Scaling Infrastructure: VPC Networks & Compute Instances
+Successfully expanded the declarative blueprint to stand up an isolated cloud network architecture containing virtual compute nodes.
+
+*   **Network Border Control (VPC):** Provisioned a custom Virtual Private Cloud isolated to the `10.0.0.0/16` routing grid, breaking away from standard cloud defaults.
+*   **Subnet Partitioning:** Structured a dedicated Public Subnet (`10.0.1.0/24`) inside the VPC to map public IPs automatically upon server spin-up.
+*   **Virtual Compute Engine (EC2):** Provisioned an `aws_instance` node running a mock AMI image (`ami-12345678`) sized to a `t3.micro` instance layout, verified via the AWS CLI v2 as officially `"running"`.
