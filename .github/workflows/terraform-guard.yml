@@ -1,13 +1,15 @@
-name: Terraform Code Quality Guard
+name: Continuous Integration Pipeline
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
+  # ==========================================
+  # JOB 1: INFRASTRUCTURE COMPLIANCE
+  # ==========================================
   validate-infrastructure:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -25,3 +27,26 @@ jobs:
 
       - name: Validate Syntax Structure
         run: terraform validate
+
+  # ==========================================
+  # JOB 2: APPLICATION CONTAINERIZATION
+  # ==========================================
+  build-application:
+    runs-on: ubuntu-latest
+    # DEPENDENCY RULE: Only run this job if the infrastructure checks pass perfectly
+    needs: validate-infrastructure
+
+    steps:
+      # Step 1: Clone the codebase onto this second fresh virtual machine
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Docker Buildx (advanced engine for faster cloud image building)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Compile the application code directly into a standardized Docker Image
+      - name: Compile and Verify Docker Build
+        run: |
+          docker build -t sillypets-app:${{ github.sha }} .
+          docker build -t sillypets-app:latest .
