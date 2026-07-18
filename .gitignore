@@ -1,0 +1,15 @@
+# Local .terraform directory (Contains binary plugins)
+.terraform/
+
+# Hide all local state memory files (Prevents secret leaks)
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+
+# Ignore local variable override files if you make them later
+*.tfvars
+*.tfvars.json
+
+# Ignore system files
+.DS_Store
+Thumbs.db
