@@ -58,20 +58,21 @@ jobs:
       # Link the Buildx driver to the host network so it can talk to port 4566
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        # 🚨 ADDED: Explicit inline configuration to force plain HTTP for the emulator registry
         with:
           driver-opts: network=host
+          # 🔧 MODIFIED: Simplified the plain registry endpoint definition to prevent S3 routing overlap
           config-inline: |
-            [registry."000000000000.dkr.ecr.us-east-1.localhost:4566"]
+            [registry."localhost:4566"]
               http = true
               insecure = true
 
-      # Compile the container image and ship it into the isolated emulator repository using ECR naming patterns
+      # Compile the container image and ship it into the isolated emulator repository using flat localhost mapping
       - name: Compile and Push Image to Local ECR
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
+          # 🔧 MODIFIED: Stripped out the 12-digit mock subdomains to target the base ECR service route cleanly
           tags: |
-            000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:latest
-            000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:${{ github.sha }}
+            localhost:4566/sillypets-app:latest
+            localhost:4566/sillypets-app:${{ github.sha }}
