@@ -37,16 +37,31 @@ jobs:
     needs: validate-infrastructure
 
     steps:
-      # Step 1: Clone the codebase onto this second fresh virtual machine
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Docker Buildx (advanced engine for faster cloud image building)
+      # 1. Handshake with your emulated AWS environment
+      - name: Authenticate with AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: "test"
+          aws-secret-access-key: "test"
+          aws-region: us-east-1
+
+      # 2. Authenticate the local Docker engine with your ECR warehouse
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 3: Compile the application code directly into a standardized Docker Image
-      - name: Compile and Verify Docker Build
-        run: |
-          docker build -t sillypets-app:${{ github.sha }} .
-          docker build -t sillypets-app:latest .
+      # 3. Build the container and push it automatically using the dynamic registry name
+      - name: Compile and Push Image to Amazon ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:latest
+            000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:${{ github.sha }}
