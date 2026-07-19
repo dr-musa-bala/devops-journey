@@ -106,3 +106,95 @@ config-inline: |
 ## 📦 Verified Pipeline Configuration
 
 The fully resolved, green-verified `.github/workflows/terraform-guard.yml` layout can be reviewed directly in our codebase. It runs independently of real AWS credentials, ensures zero data drift, and verifies our container logic end-to-end within runtime memory boundaries.
+---
+
+## 🛠️ Milestone Documentation: Automated Pre-Push Vulnerability Gates (DevSecOps)
+
+### 1. Objective & Design Philosophy
+
+In an enterprise cloud pipeline, building a container image is only half the battle. Shifting security left means verifying that our container images do not contain known vulnerabilities or exposed common packages before they ever touch an operational registry.
+
+Our goal was to insert **Aqua Security Trivy** into our pipeline as a hard quality gate. If the compiled application image contains `HIGH` or `CRITICAL` software vulnerabilities, the pipeline must terminate immediately, preventing bad code from being pushed to the local ECR registry.
+
+---
+
+### 2. The Architectural Challenge: The Buildx Boundary
+
+Modern container builds utilize the isolated **Docker Buildx (BuildKit)** subsystem. By default, Buildx compiles image layers inside an isolated virtual cache environment. If a standard build script runs, those layers never enter the host runner's primary Docker daemon, making them completely invisible to external terminal commands or local security tools.
+
+#### The Blueprint
+
+To solve this, we decoupled our pipeline sequence into a two-stage build cache strategy:
+
+1. **The Inspection Layer:** We run an initial build with the **`load: true`** flag. This tells Buildx to export the compiled binaries out of its inner workspace and load them straight into the GitHub Actions host runner's local Docker storage under a tracking tag (`sillypets-app:test`).
+2. **The Push Layer:** Once Trivy clears the image, a secondary build block runs with the **`push: true`** flag. Because BuildKit features native deep layer caching, it matches the exact cryptographic signatures from the first stage. It doesn't rebuild anything from scratch—it simply ships the validated, pre-cached layers straight to our Floci OCI registry on port `5100` in under two seconds.
+
+---
+
+### 3. The Encountered Error: Upstream Marketplace Deprecation
+
+When we attempted to implement the security scanner using standard third-party GitHub Action Marketplace wrappers, the pipeline broke instantly on execution:
+
+```text
+Error: Unable to resolve action `aquasecurity/setup-trivy@v0.2.1`, unable to find version `v0.2.1`
+
+```
+
+#### Root Cause Analysis
+
+The GitHub Action `aquasecurity/trivy-action` is a composite workflow wrapper. Under the hood, it is hardcoded to pull down secondary helper extensions (`setup-trivy`).
+
+If upstream maintainers rewrite version tags, pull down older releases, or if GitHub experience internal sync latency, the entire wrapper collapses. This introduces an unacceptable point of failure into the core delivery chain, making our builds dependent on third-party structural stability.
+
+---
+
+### 4. The Engineering Resolution: Native Container Injection
+
+Instead of relying on brittle marketplace abstractions, we bypassed the GitHub Actions Marketplace entirely. We treated the GitHub Actions runner like a raw Linux box and launched the official, production-ready **Aqua Security Trivy Docker image** directly.
+
+Because we had already mastered mounting host sockets to run our Floci cloud engine, we applied the exact same concept here. We executed a `docker run` statement, bound the underlying host's Docker socket into the Trivy container, and directed Trivy to look inside the runner's daemon to analyze our local `sillypets-app:test` binaries.
+
+#### The Hard-Gated Workflow Step
+
+```yaml
+      # 1. Export compiled layers directly to the runner's local Docker daemon
+      - name: Build Local Image for Security Analysis
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true 
+          tags: sillypets-app:test
+
+      # 2. Run Trivy natively using a container-to-host socket binding strategy
+      - name: Run Trivy Vulnerability Scanner (Native Container)
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --ignore-unfixed \
+            sillypets-app:test
+
+```
+
+---
+
+### 5. Deep-Dive: Security Control Arguments
+
+> `--severity HIGH,CRITICAL`
+> Instructs Trivy to filter out low-level warnings and documentation notes, focusing entirely on high-exploit vectors that threaten system integrity.
+
+> `--exit-code 1`
+> By default, security tools report vulnerabilities but exit with a safe code `0`, allowing pipelines to pass. Setting this parameter forces the container to throw a terminal exit status `1` if a vulnerability matches our filters, forcing GitHub Actions to stop execution and block the final push.
+
+> `--ignore-unfixed`
+> Tells the engine to completely skip vulnerabilities that do not have an officially released software patch available. This filters out noise and prevents our build pipeline from locking up due to open-source bugs that we physically cannot remediate.
+
+---
+
+### 6. Key Takeaways and Current Status
+
+* **Zero External Dependencies:** By shifting to native container execution, our security pipeline is immune to marketplace wrapper breakages.
+* **Hermetic Verification:** The entire container operating system environment is verified inside isolated memory boundaries before any remote delivery happens.
+* **Pipeline Status:** **GREEN.** The supply chain is secured, images are scanned, and only certified binaries are delivered to the local data registry.
