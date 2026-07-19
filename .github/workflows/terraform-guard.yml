@@ -33,35 +33,40 @@ jobs:
   # ==========================================
   build-application:
     runs-on: ubuntu-latest
-    # DEPENDENCY RULE: Only run this job if the infrastructure checks pass perfectly
     needs: validate-infrastructure
+
+    # Spin up the floci emulator directly inside GitHub's cloud runner environment
+    services:
+      floci:
+        image: floci/floci:latest
+        ports:
+          - 4566:4566
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      # 1. Handshake with your emulated AWS environment
-      - name: Authenticate with AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: "test"
-          aws-secret-access-key: "test"
-          aws-region: us-east-1
+      # Create the repository inside the fresh emulator instance running on port 4566
+      - name: Initialize ECR Repo in Emulator
+        run: |
+          aws ecr create-repository --repository-name sillypets-app --region us-east-1 --endpoint-url http://localhost:4566
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_DEFAULT_REGION: us-east-1
 
-      # 2. Authenticate the local Docker engine with your ECR warehouse
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
+      # Link the Buildx driver to the host network so it can talk to port 4566
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
 
-      # 3. Build the container and push it automatically using the dynamic registry name
-      - name: Compile and Push Image to Amazon ECR
+      # Compile the container image and ship it into the isolated emulator repository
+      - name: Compile and Push Image to Local ECR
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:latest
-            000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:${{ github.sha }}
+            localhost:4566/sillypets-app:latest
+            localhost:4566/sillypets-app:${{ github.sha }}
