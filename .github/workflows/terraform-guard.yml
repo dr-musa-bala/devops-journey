@@ -65,7 +65,7 @@ jobs:
               http = true
               insecure = true
 
-      # 🚨 NEW STEP 1: Export compiled layers directly to the runner's local Docker daemon
+      # Export compiled layers directly to the runner's local Docker daemon
       - name: Build Local Image for Security Analysis
         uses: docker/build-push-action@v6
         with:
@@ -73,16 +73,16 @@ jobs:
           load: true 
           tags: sillypets-app:test
 
-      # 🚨 NEW STEP 2: Execute Aqua Security Trivy static binary analysis
-      - name: Run Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          image-ref: 'sillypets-app:test'
-          format: 'table'
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-          exit-code: '1'          # <-- Hard gate: Fail pipeline if vulns are discovered
-          ignore-unfixed: true    # <-- Ignore noise; only flag vulns with an available fix
+      # 🚨 FIXED: Bypassed the flaky marketplace wrapper action to run Trivy natively via Docker container
+      - name: Run Trivy Vulnerability Scanner (Native Container)
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --ignore-unfixed \
+            sillypets-app:test
 
       # Compile and Push Image to Local ECR Data Plane (runs instantly via BuildKit cache matching)
       - name: Compile and Push Image to Local ECR
