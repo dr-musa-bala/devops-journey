@@ -35,12 +35,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate-infrastructure
 
-    # Spin up the floci emulator directly inside GitHub's cloud runner environment
     services:
       floci:
         image: floci/floci:latest
         ports:
           - 4566:4566
+        # 🚨 ADDED: Expose host Docker socket so Floci can launch backend ECR containers
+        options: -v /var/run/docker.sock:/var/run/docker.sock
 
     steps:
       - name: Check out repository code
@@ -61,12 +62,13 @@ jobs:
         with:
           driver-opts: network=host
 
-      # Compile the container image and ship it into the isolated emulator repository
+      # Compile the container image and ship it into the isolated emulator repository using ECR naming patterns
       - name: Compile and Push Image to Local ECR
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
+          # 🔧 MODIFIED: Using matching emulator naming conventions for local repository tags
           tags: |
-            localhost:4566/sillypets-app:latest
-            localhost:4566/sillypets-app:${{ github.sha }}
+            000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:latest
+            000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:${{ github.sha }}
