@@ -40,7 +40,6 @@ jobs:
         image: floci/floci:latest
         ports:
           - 4566:4566
-        # 🚨 ADDED: Expose host Docker socket so Floci can launch backend ECR containers
         options: -v /var/run/docker.sock:/var/run/docker.sock
 
     steps:
@@ -59,8 +58,13 @@ jobs:
       # Link the Buildx driver to the host network so it can talk to port 4566
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        # 🚨 ADDED: Explicit inline configuration to force plain HTTP for the emulator registry
         with:
           driver-opts: network=host
+          config-inline: |
+            [registry."000000000000.dkr.ecr.us-east-1.localhost:4566"]
+              http = true
+              insecure = true
 
       # Compile the container image and ship it into the isolated emulator repository using ECR naming patterns
       - name: Compile and Push Image to Local ECR
@@ -68,7 +72,6 @@ jobs:
         with:
           context: .
           push: true
-          # 🔧 MODIFIED: Using matching emulator naming conventions for local repository tags
           tags: |
             000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:latest
             000000000000.dkr.ecr.us-east-1.localhost:4566/sillypets-app:${{ github.sha }}
