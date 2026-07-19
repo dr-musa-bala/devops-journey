@@ -55,24 +55,24 @@ jobs:
           AWS_SECRET_ACCESS_KEY: test
           AWS_DEFAULT_REGION: us-east-1
 
-      # Link the Buildx driver to the host network so it can talk to port 4566
+      # Link the Buildx driver to the host network so it can talk to port 5100
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
-          # 🔧 MODIFIED: Simplified the plain registry endpoint definition to prevent S3 routing overlap
+          # 🚨 ADDED: Shifted the insecure registry mapping to port 5100 where Floci hosts the actual ECR registry data layer
           config-inline: |
-            [registry."localhost:4566"]
+            [registry."000000000000.dkr.ecr.us-east-1.localhost:5100"]
               http = true
               insecure = true
 
-      # Compile the container image and ship it into the isolated emulator repository using flat localhost mapping
+      # Compile the container image and ship it into the isolated emulator repository using the correct OCI registry port
       - name: Compile and Push Image to Local ECR
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          # 🔧 MODIFIED: Stripped out the 12-digit mock subdomains to target the base ECR service route cleanly
+          # 🔧 MODIFIED: Swapped the tags to use the proper domain structure and port 5100 required by Floci's ECR engine
           tags: |
-            localhost:4566/sillypets-app:latest
-            localhost:4566/sillypets-app:${{ github.sha }}
+            000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:latest
+            000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:${{ github.sha }}
