@@ -199,3 +199,19 @@ resource "aws_ecs_task_definition" "app_task" {
     }
   ])
 }
+# ==========================================
+# 4. RUNTIME MANAGEMENT (THE LIVELINESS ENGINE)
+# ==========================================
+resource "aws_ecs_service" "app_service" {
+  name            = "sillypets-service"
+  cluster         = aws_ecs_cluster.app_cluster.id
+  task_definition = aws_ecs_task_definition.app_task.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  # Tells the system how to route basic networking to the container
+  network_configuration {
+    subnets          = ["subnet-dummy-123"] # Our local emulator accepts any text here
+    assign_public_ip = true
+  }
+}

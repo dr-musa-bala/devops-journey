@@ -122,3 +122,19 @@ jobs:
           AWS_SECRET_ACCESS_KEY: test
           AWS_DEFAULT_REGION: us-east-1
           TF_VAR_image_tag: ${{ github.sha }}
+# 🚨 NEW: THE VERIFICATION GATE (SMOKE TEST)
+      - name: Verify Service Status via Cloud Control Plane
+        run: |
+          echo "Waiting 5 seconds for infrastructure configurations to settle..."
+          sleep 5
+          
+          echo "Querying the cluster for our running service..."
+          aws ecs describe-services \
+            --cluster sillypets-cluster \
+            --services sillypets-service \
+            --endpoint-url http://localhost:4566 \
+            --region us-east-1
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_DEFAULT_REGION: us-east-1
