@@ -94,7 +94,7 @@ jobs:
             000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:latest
             000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:${{ github.sha }}
 
-     # ==========================================
+            # ==========================================
       # CONTINUOUS DEPLOYMENT (CD) PHASE
       # ==========================================
       - name: Set up Terraform CLI for Deployment
@@ -102,12 +102,16 @@ jobs:
         with:
           terraform_wrapper: false
 
-      # 🚨 FIX: Dynamically strip production S3 backend so the local sandbox uses standard local state
-      - name: Patch Backend for Local Sandbox Execution
+      # 🚨 FIX: Create a native override file to cleanly swap out the S3 backend for local state tracking
+      - name: Create Native Backend Override for Sandbox
         run: |
-          sed -i '/backend "s3"/,/}/d' *.tf
+          cat <<EOF > backend_override.tf
+          terraform {
+            backend "local" {}
+          }
+          EOF
 
-      # 🚨 FIX: Removed '-backend=false' to allow the local backend to initialize properly
+      # Initialize using our clean local backend override map
       - name: Initialize Terraform Deployment
         run: terraform init
 
