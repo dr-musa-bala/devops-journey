@@ -1,3 +1,13 @@
+# ==========================================
+# 1. VARIABLE SCHEMA FOR AUTOMATION
+# ==========================================
+variable "image_tag" {
+  type        = string
+  description = "The specific GitHub SHA tag of the container image to deploy"
+  default     = "latest"
+}
+
+
 terraform {
   required_providers {
     aws = {
@@ -42,6 +52,8 @@ provider "aws" {
     iam      = "http://localhost:4566"
     dynamodb = "http://localhost:4566"
     sts      = "http://localhost:4566"
+    ecr      = "http://localhost:4566"
+    ecs      = "http://localhost:4566"
   }
 }
 
@@ -151,4 +163,39 @@ resource "aws_dynamodb_table" "state_locks" {
     name = "LockID"
     type = "S"
   }
+}
+
+# ==========================================
+# 3. CONTAINER INFRASTRUCTURE PROVISIONING
+# ==========================================
+
+# Define the logical hosting cluster boundary
+resource "aws_ecs_cluster" "app_cluster" {
+  name = "sillypets-cluster"
+}
+
+# Define the execution blueprint for our container runtime
+resource "aws_ecs_task_definition" "app_task" {
+  family                   = "sillypets-app"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+
+  container_definitions = jsonencode([
+    {
+      name      = "sillypets-container"
+      # 🚨 THE CD CONNECTOR: Injecting the dynamic registry target and variable tag
+      image     = "000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:${var.image_tag}"
+      cpu       = 256
+      memory    = 512
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort      = 80
+        }
+      ]
+    }
+  ])
 }
