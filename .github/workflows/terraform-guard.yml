@@ -94,7 +94,7 @@ jobs:
             000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:latest
             000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:${{ github.sha }}
 
-            # ==========================================
+      # ==========================================
       # CONTINUOUS DEPLOYMENT (CD) PHASE
       # ==========================================
       - name: Set up Terraform CLI for Deployment
