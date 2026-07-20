@@ -198,3 +198,36 @@ Because we had already mastered mounting host sockets to run our Floci cloud eng
 * **Zero External Dependencies:** By shifting to native container execution, our security pipeline is immune to marketplace wrapper breakages.
 * **Hermetic Verification:** The entire container operating system environment is verified inside isolated memory boundaries before any remote delivery happens.
 * **Pipeline Status:** **GREEN.** The supply chain is secured, images are scanned, and only certified binaries are delivered to the local data registry.
+
+---
+
+# Milestone Documentation: Automated Deployment (CD) with Terraform
+
+## 1. What We Built
+
+We turned our pipeline into a true **Continuous Deployment (CD)** framework. Now, as soon as the application image passes security checks, GitHub Actions automatically passes its unique version code (`github.sha`) directly to Terraform and runs `terraform apply`. This deploys our app to an emulated cloud cluster inside the runner.
+
+---
+
+## 2. Problem 1: The S3 Backend Error
+
+When the pipeline tried to run `terraform apply`, it crashed with a message saying it needed to initialize a remote S3 backend.
+
+* **Why it happened:** Our real infrastructure code is configured to save its progress file (the state file) inside a real AWS S3 bucket. Because the GitHub Actions runner is temporary and testing against a local emulator, it had no way to access a real S3 bucket.
+* **How we fixed it:** We didn't want to change our core project code permanently. Instead, we used a native feature called **Terraform Overrides**. We told the pipeline to create a temporary file named `backend_override.tf` right before running the deployment. This file tells Terraform to switch its state storage to "local" mode just for this specific pipeline test.
+
+---
+
+## 3. Problem 2: The YAML Multi-line Tag Error
+
+During a Docker build step, the pipeline crashed with an error stating that `# ==========================================` was an invalid image tag name.
+
+* **Why it happened:** In our workflow file, we used a pipe symbol (`tags: |`) to list our Docker tags on multiple lines. In YAML formatting, this pipe symbol tells the system to treat every single indented line below it as raw text. Because of this, our clean-up divider comment (`# ===`) was treated as an actual name for a Docker tag instead of being ignored as a comment.
+* **How we fixed it:** We removed the comment lines from the indented block and shifted our section headers all the way to the left margin, separating them completely from the list of Docker tags.
+
+---
+
+## 4. Final Key Lessons Learned
+
+* **Use Overrides, Not Text Editing:** Trying to use automated search-and-replace tools (like `sed`) to rewrite configuration code is risky. Using native override files (`_override.tf`) is a much cleaner way to swap infrastructure targets during testing.
+* **Watch Your Indentation:** When listing multiple strings in YAML using the multiline pipe layout (`|`), keep comments completely out of the indented block to prevent the build engine from parsing them as literal text inputs.
