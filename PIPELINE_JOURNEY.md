@@ -231,3 +231,36 @@ During a Docker build step, the pipeline crashed with an error stating that `# =
 
 * **Use Overrides, Not Text Editing:** Trying to use automated search-and-replace tools (like `sed`) to rewrite configuration code is risky. Using native override files (`_override.tf`) is a much cleaner way to swap infrastructure targets during testing.
 * **Watch Your Indentation:** When listing multiple strings in YAML using the multiline pipe layout (`|`), keep comments completely out of the indented block to prevent the build engine from parsing them as literal text inputs.
+
+---
+
+# Milestone Documentation: Running Live Containers & Automated Verification
+
+## 1. What We Built
+
+We took our infrastructure blueprint and turned it into an active, running application. We also added an automated safety check at the very end of the pipeline to verify the app launched correctly.
+
+* **The ECS Service (The Manager):** We added an ECS Service block to `main.tf`. While the *Task Definition* is just a blueprint, the *Service* is the manager that actually launches the container and keeps it running. We set the `desired_count` to `1`, meaning if the container crashes, the service automatically creates a new one to replace it.
+* **The Cloud Smoke Test (The Verification Gate):** We added a final step to our pipeline file using the command `aws ecs describe-services`. This step automatically polls the emulator control plane to ask: *"Is our service up and running safely?"* If it finds the running service, the pipeline stays green.
+
+---
+
+## 2. A Crucial Git Lesson: Atomic Commits
+
+During this update, we made changes to two separate files at the same time: the infrastructure configuration (`main.tf`) and the pipeline automation configuration (`terraform-guard.yml`).
+
+* **The Risk:** If we had only pushed the pipeline file, the automated workflow would have looked for the new service check, but the infrastructure file wouldn't have known how to build it yet. The pipeline would have instantly broken.
+* **The Fix:** We practiced a core DevOps habit called **Atomic Commits**—grouping related files together (`git add main.tf .github/workflows/...`) so they travel upstream as one complete unit. This ensures the environment never gets left in a half-finished state.
+
+---
+
+## 3. The Final 6-Step Pipeline Flow (Summary)
+
+Our completed, production-ready pipeline now executes these exact checks every single time we push new code:
+
+1. **Style Check:** Runs `terraform fmt` to ensure the layout is clean.
+2. **Syntax Check:** Runs `terraform validate` to catch typos before provisioning.
+3. **Container Build:** Uses Docker Buildx to bundle our application layers.
+4. **Security Scan:** Uses Trivy to scan the container for vulnerabilities before saving it.
+5. **Local Isolation:** Creates a temporary override file to test deployment safely inside our sandbox.
+6. **Smoke Test:** Queries the cloud environment to confirm the container is alive and running smoothly.
