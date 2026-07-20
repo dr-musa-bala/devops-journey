@@ -94,14 +94,22 @@ jobs:
             000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:latest
             000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:${{ github.sha }}
 
-      # 🚨 NEW: CONTINUOUS DEPLOYMENT (CD) PHASE
+     # ==========================================
+      # CONTINUOUS DEPLOYMENT (CD) PHASE
+      # ==========================================
       - name: Set up Terraform CLI for Deployment
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
+      # 🚨 FIX: Dynamically strip production S3 backend so the local sandbox uses standard local state
+      - name: Patch Backend for Local Sandbox Execution
+        run: |
+          sed -i '/backend "s3"/,/}/d' *.tf
+
+      # 🚨 FIX: Removed '-backend=false' to allow the local backend to initialize properly
       - name: Initialize Terraform Deployment
-        run: terraform init -backend=false
+        run: terraform init
 
       - name: Deploy Container Infrastructure via Local Apply
         run: terraform apply -auto-approve
@@ -109,5 +117,4 @@ jobs:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
           AWS_DEFAULT_REGION: us-east-1
-          # The Connector: Injecting the cryptographic pipeline signature into Terraform variables
           TF_VAR_image_tag: ${{ github.sha }}
