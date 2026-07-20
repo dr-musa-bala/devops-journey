@@ -184,7 +184,7 @@ resource "aws_ecs_task_definition" "app_task" {
 
   container_definitions = jsonencode([
     {
-      name      = "sillypets-container"
+      name = "sillypets-container"
       # 🚨 THE CD CONNECTOR: Injecting the dynamic registry target and variable tag
       image     = "000000000000.dkr.ecr.us-east-1.localhost:5100/sillypets-app:${var.image_tag}"
       cpu       = 256
