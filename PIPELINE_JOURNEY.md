@@ -264,3 +264,36 @@ Our completed, production-ready pipeline now executes these exact checks every s
 4. **Security Scan:** Uses Trivy to scan the container for vulnerabilities before saving it.
 5. **Local Isolation:** Creates a temporary override file to test deployment safely inside our sandbox.
 6. **Smoke Test:** Queries the cloud environment to confirm the container is alive and running smoothly.
+
+---
+# Milestone Documentation: Secrets Management & Pipeline Hardening
+
+## 1. What We Built
+
+We transitioned our Continuous Deployment pipeline from using local test credentials (`AWS_ACCESS_KEY_ID: test`) to using **GitHub Repository Secrets**.
+
+* **The Encrypted Vault:** Stored sensitive credentials (`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) securely inside GitHub's built-in encrypted vault under `Settings > Secrets and variables > Actions`.
+* **Dynamic Vault Injection:** Updated `.github/workflows/terraform-guard.yml` to inject credentials at runtime using the `${{ secrets.SECRET_NAME }}` syntax instead of plain text.
+
+---
+
+## 2. Why Secrets Management Matters in Production
+
+Hardcoding passwords, cloud keys, or API tokens into code repositories is one of the leading causes of security breaches in software engineering.
+
+* **Prevention of Accidental Credential Leaks:** If code containing plain-text keys is pushed to a public or shared repository, automated bot scanners can scrape those keys within seconds and generate massive unauthorized cloud bills.
+* **Automatic Log Masking:** GitHub Actions automatically intercepts any output attempting to print stored secrets into the build execution logs and censors them with `***`.
+* **Centralized Key Rotation:** If a cloud access key needs to be changed, developers update it once in the GitHub Vault settings without needing to modify or re-commit any application code files.
+
+---
+
+## 3. Updated Production Pipeline Architecture
+
+Every code push to `main` now executes this end-to-end hardened flow:
+
+1. **Linting & Format Validation:** Ensures clean code syntax (`terraform fmt`, `terraform validate`).
+2. **Containerization:** Packages application code using Docker Buildx engines.
+3. **Vulnerability Scanning:** Runs Trivy to intercept security flaws inside container layers.
+4. **Environment Isolation:** Dynamically applies local overrides for testing safety.
+5. **Secure Infrastructure Deployment:** Authenticates via encrypted GitHub Secrets to provision ECS resources.
+6. **Automated Verification:** Queries the cloud control plane (`describe-services`) to confirm container health.
