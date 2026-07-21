@@ -1,0 +1,34 @@
+
+services:
+  # Tier 1: The Relational Database System
+  db:
+    image: postgres:15-alpine
+    container_name: sillypets-backend-db
+    environment:
+      POSTGRES_USER: musa_admin
+      POSTGRES_PASSWORD: SuperSecurePassword123
+      POSTGRES_DB: sillypets_records
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - sillypets-net
+
+  # Tier 2: The Front-End Web Application
+  web:
+    image: nginx:alpine
+    container_name: sillypets-frontend-web
+    ports:
+      - "8082:80"
+    networks:
+      - sillypets-net
+    depends_on:
+      - db # Forces Docker to wait until the database is up before launching the web layer
+
+# Permanent disk storage so your database data doesn't disappear when containers stop
+volumes:
+  pgdata:
+
+# The private network mesh connecting the two tiers together
+networks:
+  sillypets-net:
+    driver: bridge
