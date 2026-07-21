@@ -51,8 +51,8 @@ jobs:
         run: |
           aws ecr create-repository --repository-name sillypets-app --region us-east-1 --endpoint-url http://localhost:4566
         env:
-          AWS_ACCESS_KEY_ID: test
-          AWS_SECRET_ACCESS_KEY: test
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           AWS_DEFAULT_REGION: us-east-1
 
       # Link the Buildx driver to the host network and map our unencrypted data plane on port 5100
@@ -118,8 +118,8 @@ jobs:
       - name: Deploy Container Infrastructure via Local Apply
         run: terraform apply -auto-approve
         env:
-          AWS_ACCESS_KEY_ID: test
-          AWS_SECRET_ACCESS_KEY: test
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           AWS_DEFAULT_REGION: us-east-1
           TF_VAR_image_tag: ${{ github.sha }}
 # 🚨 NEW: THE VERIFICATION GATE (SMOKE TEST)
@@ -135,6 +135,6 @@ jobs:
             --endpoint-url http://localhost:4566 \
             --region us-east-1
         env:
-          AWS_ACCESS_KEY_ID: test
-          AWS_SECRET_ACCESS_KEY: test
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           AWS_DEFAULT_REGION: us-east-1
