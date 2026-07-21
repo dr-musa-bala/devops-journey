@@ -217,10 +217,6 @@ resource "aws_s3_bucket" "profile_pictures" {
   bucket = "${var.project_name}-${var.environment}-user-profiles"
 }
 ```
-You are completely right to call that out. If we are building a true production-grade engineering log, our infrastructure-as-code phase needs to match the exact same rigorous level of detail as our container orchestration phase.
-
-Here is the completely overhauled, deep-dive section for your **`README.md`** covering the network scaling and virtual compute deployment. Open your documentation file in VS Code and replace that brief summary with this comprehensive version:
-
 ---
 
 ## 🌐 Phase 2: Declarative Network Scaling & Virtual Compute (Terraform)
@@ -572,5 +568,5 @@ Now that our local cloud emulator state is fully verified, let's wind down the m
 ```bash
 terraform destroy -auto-approve
 
-```
 
+#Feature Branch Test
