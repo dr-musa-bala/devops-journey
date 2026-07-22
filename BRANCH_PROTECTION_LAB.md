@@ -134,3 +134,74 @@ git status
 > * **GitHub Free Limitation:** Branch protection rules require a **Public** repository when using a free GitHub personal account.
 > * **Protection Error (`GH006`):** Seeing `protected branch hook declined` is the target confirmation that branch security is working correctly.
 > * **Fast Reset:** `git reset --hard HEAD~1` safely undoes an un-pushed test commit without leaving dirty working tree edits behind.
+
+---
+
+# Solo Developer Branch Protection & PR Override Guide
+
+## 1. Problem Overview
+
+When setting up Branch Protection Rules on GitHub for a solo project, you may encounter a deadlock during Pull Request (PR) merging:
+
+### Error Messages
+
+> **Review required:** *An approval on the most recent push is required by reviewers with write access.*
+> **Merging is blocked:** *New changes require approval from someone other than the last pusher.*
+
+### Root Cause
+
+By default, GitHub's branch protection policies enforce enterprise peer-review rules, requiring a **second account with write access** to review and approve any PR before it can be merged into `main`. In a solo repository, the author and the administrator are the same person, leading to a permanent merge block.
+
+---
+
+## 2. The Solution: Adjusting Rules for Solo Workflows
+
+To preserve branch protection (blocking direct terminal pushes to `main`) while allowing yourself to merge your own Pull Requests, adjust the approval settings:
+
+1. **1. Open Branch Protection Settings:** Repository Settings.
+Navigate to **Settings** $\rightarrow$ **Branches** $\rightarrow$ Click **Edit** next to the `main` protection rule.
+
+
+2. **2. Reconfigure Approval Requirements:** Policy adjustment.
+Under **"Require a pull request before merging"**:
+
+* **Uncheck:** `Require approvals` *(or set required approvals count to 0)*.
+* **Uncheck:** `Require approval from someone other than the last pusher`.
+* **Keep Checked:** `Require a pull request before merging`.
+
+
+3. **3. Save & Test:** Apply rule.
+Click **Save changes** at the bottom of the page. Return to your open PR on GitHub—the green **"Merge pull request"** button will now be unlocked.
+
+
+---
+
+## 3. Terminal Sync Commands
+
+After completing the merge on GitHub, run these commands in your local terminal to update your machine and clean up the feature branch:
+
+```bash
+# 1. Switch to your local main branch
+git checkout main
+
+# 2. Pull the newly merged changes from GitHub
+git pull origin main
+
+# 3. (Optional) Delete the merged local feature branch
+git branch -d feat/branch-protection-test
+
+# 4. Verify working tree status
+git status
+
+```
+
+---
+
+## 4. Ideal Solo Dev vs. Team Configuration Matrix
+
+| Rule Option | Solo Developer Repo | Team / Enterprise Repo |
+| --- | --- | --- |
+| **Require a pull request before merging** | **ENABLED** *(Prevents accidental direct pushes)* | **ENABLED** |
+| **Require approvals** | **DISABLED** *(Avoids self-approval block)* | **ENABLED** *(1+ approvals required)* |
+| **Require approval from last pusher** | **DISABLED** | **ENABLED** |
+| **Do not allow bypassing settings** | **ENABLED** *(Enforces PR workflow for admin)* | **ENABLED** |
