@@ -1,0 +1,27 @@
+name: Sanity & Smoke Test
+
+on:
+  push:
+    branches: [ "main", "feat/*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  smoke-test-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Step 1 - Download Repository Code
+        uses: actions/checkout@v4
+
+      - name: Step 2 - Check Runner System Info
+        run: |
+          echo "=========================================="
+          echo "Running on OS: $(uname -a)"
+          echo "Current Directory: $(pwd)"
+          echo "=========================================="
+
+      - name: Step 3 - Verify Repository Files
+        run: |
+          echo "Listing all files in repository:"
+          ls -la
