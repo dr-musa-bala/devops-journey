@@ -26,8 +26,7 @@ jobs:
           echo "Listing all files in repository:"
           ls -la
 
-      - name: Step 4 - Intentional Failure Test
+      - name: Step 4 - Verify Python Installation
         run: |
-          echo "Checking application health..."
-          # This command does not exist, so Linux will throw an error!
-          non_existent_command_test
+          echo "Checking if Python 3 is available on the runner:"
+          python3 --version
