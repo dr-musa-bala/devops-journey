@@ -25,3 +25,9 @@ jobs:
         run: |
           echo "Listing all files in repository:"
           ls -la
+
+      - name: Step 4 - Intentional Failure Test
+        run: |
+          echo "Checking application health..."
+          # This command does not exist, so Linux will throw an error!
+          non_existent_command_test
