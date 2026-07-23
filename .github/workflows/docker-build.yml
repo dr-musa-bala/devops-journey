@@ -1,0 +1,35 @@
+name: Docker Image Build & Test
+
+on:
+  push:
+    branches: [ "main", "feat/*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test-container:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Step 1 - Download Repository Code
+        uses: actions/checkout@v4
+
+      - name: Step 2 - Verify Docker Engine
+        run: |
+          docker --version
+
+      - name: Step 3 - Build Nginx Web Server Image
+        run: |
+          echo "Building Nginx container image..."
+          docker build -t my-web-app:latest .
+
+      - name: Step 4 - Boot Web Container & Test HTTP Response
+        run: |
+          echo "Starting Nginx container in background on port 8080..."
+          docker run -d -p 8080:80 --name test-web-server my-web-app:latest
+          
+          # Pause 2 seconds to let Nginx initialize
+          sleep 2
+          
+          echo "Sending HTTP request to test web server:"
+          curl -I http://localhost:8080
