@@ -1,11 +1,7 @@
 # ==========================================
 # 1. VARIABLE SCHEMA FOR AUTOMATION
 # ==========================================
-variable "image_tag" {
-  type        = string
-  description = "The specific GitHub SHA tag of the container image to deploy"
-  default     = "latest"
-}
+
 
 
 terraform {
