@@ -30,3 +30,27 @@ jobs:
         run: |
           echo "Checking if Python 3 is available on the runner:"
           python3 --version
+
+# -------------------------------------------------------------
+      # Cache Trivy Vulnerability DB (Speeds up scans by 2-3 mins)
+      # -------------------------------------------------------------
+      - name: Cache Trivy Vulnerability Database
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: ${{ runner.os }}-trivy-db-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-trivy-db-
+
+      # -------------------------------------------------------------
+      # Aqua Security Trivy Vulnerability Scan
+      # -------------------------------------------------------------
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.28.0
+        with:
+          image-ref: 'local-scan-target:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
