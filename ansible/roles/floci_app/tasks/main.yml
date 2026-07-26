@@ -1,0 +1,12 @@
+---
+- name: Ensure target directory exists for Floci report
+  file:
+    path: "{{ ansible_env.HOME }}/floci-ansible-lab"
+    state: directory
+    mode: '0755'
+
+- name: Deploy dynamic HTML status page from role template
+  template:
+    src: server_info.html.j2
+    dest: "{{ ansible_env.HOME }}/floci-ansible-lab/index.html"
+    mode: '0644'

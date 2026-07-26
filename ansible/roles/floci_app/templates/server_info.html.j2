@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server Status - {{ ansible_hostname }}</title>
+</head>
+<body>
+    <h1>System Status Report</h1>
+    <p><strong>Managed Node:</strong> {{ ansible_hostname }}</p>
+    <p><strong>Operating System:</strong> {{ ansible_distribution }} {{ ansible_distribution_version }}</p>
+    <p><strong>Target Environment:</strong> {{ env_name }}</p>
+    <p><strong>Application Port:</strong> {{ app_port }}</p>
+
+    <h2>Active Service Features</h2>
+    <ul>
+    {% for feature in enabled_features %}
+        <li>Feature: {{ feature }}</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
