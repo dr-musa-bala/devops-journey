@@ -1,0 +1,7 @@
+---
+- name: Deploy Modular Application Stack using Ansible Roles
+  hosts: local
+  gather_facts: yes
+
+  roles:
+    - floci_app

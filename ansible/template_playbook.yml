@@ -1,0 +1,21 @@
+---
+- name: "Module 2: Deploy Dynamic Jinja2 Configuration"
+  hosts: local
+  vars:
+    env_name: "Development (Floci Local Stack)"
+    app_port: 8080
+    enabled_features:
+      - "S3 Emulation"
+      - "DynamoDB State Locks"
+      - "ECS Fargate Orchestration"
+
+  tasks:
+    - name: Render Jinja2 template into an HTML report
+      template:
+        src: server_info.html.j2
+        dest: "{{ ansible_env.HOME }}/floci-ansible-lab/index.html"
+        mode: '0644'
+
+    - name: Verify generated file
+      debug:
+        msg: "Successfully compiled template to {{ ansible_env.HOME }}/floci-ansible-lab/index.html"

@@ -1,0 +1,53 @@
+---
+- name: "Phase 6 Capstone: End-to-End Infrastructure & Service Automation"
+  hosts: local
+  gather_facts: yes
+  vars:
+    stack_port: 8090
+    engineer_name: "Dr. Musa Bala Audu"
+    web_root: "{{ ansible_env.HOME }}/floci-ansible-lab/capstone_web"
+
+  tasks:
+    # 1. Directory Structure Setup
+    - name: Ensure capstone web directory exists
+      file:
+        path: "{{ web_root }}"
+        state: directory
+        mode: '0755'
+
+    # 2. Dynamic Config / Content Rendering (Jinja2)
+    - name: Render dynamic web content from Jinja2 template
+      template:
+        src: capstone_index.html.j2
+        dest: "{{ web_root }}/index.html"
+        mode: '0644'
+
+    # 3. Container Management (Nginx serving rendered web volume)
+    - name: Launch Nginx container serving rendered web root
+      command: >
+        docker run -d --name capstone-web-stack
+        -p {{ stack_port }}:80
+        -v {{ web_root }}:/usr/share/nginx/html:ro
+        nginx:alpine
+      register: capstone_docker
+      failed_when: false
+
+    # 4. Automated Health Inspection (HTTP Probe)
+    - name: Perform automated HTTP health probe on container port
+      uri:
+        url: "http://localhost:{{ stack_port }}"
+        status_code: 200
+      register: capstone_health
+      retries: 3
+      delay: 2
+
+    # 5. Output Verification Log
+    - name: Display Capstone Execution Summary
+      debug:
+        msg:
+          - "================================================="
+          - "PHASE 6 CAPSTONE DEPLOYMENT SUCCESSFUL"
+          - "Target Host: {{ ansible_hostname }} ({{ ansible_distribution }})"
+          - "Endpoint URL: http://localhost:{{ stack_port }}"
+          - "HTTP Probe Status: {{ capstone_health.status }} OK"
+          - "================================================="

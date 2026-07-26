@@ -1,0 +1,28 @@
+---
+- name: "Module 4: Orchestrate Docker Containers"
+  hosts: local
+  gather_facts: yes
+
+  tasks:
+    - name: Pull and start an Nginx container using Docker CLI
+      command: docker run -d --name sillypets-web -p 8085:80 nginx:alpine
+      register: docker_start
+      failed_when: false  # Prevents failure if container name already exists
+
+    - name: Check running containers
+      command: docker ps --filter "name=sillypets-web"
+      register: container_status
+
+    - name: Display container health status
+      debug:
+        msg: "{{ container_status.stdout_lines }}"
+
+    - name: Test HTTP response from container
+      uri:
+        url: "http://localhost:8085"
+        status_code: 200
+      register: http_response
+
+    - name: Confirm web server response
+      debug:
+        msg: "🟢 Nginx web container is reachable! HTTP Status: {{ http_response.status }}"

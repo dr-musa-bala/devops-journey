@@ -114,8 +114,8 @@ resource "aws_instance" "web_server" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt-get update -y
-              apt-get install docker.io -y
+              dnf update -y
+              dnf install -y docker
               systemctl start docker
               systemctl enable docker
               docker run -d --name sillypets-app -p 80:80 nginx:alpine
@@ -134,8 +134,8 @@ output "bucket_name" {
 
 # 🪣 The Central S3 Storage Bucket for State Files (Fully Active!)
 resource "aws_s3_bucket" "state_storage" {
-  bucket        = "musa-devops-sillypets-state-bucket"
-  force_destroy = true
+  bucket        = "musa-devops-sillypets-state-bucket-local"
+  #force_destroy = true
 }
 
 # Enforce encryption on our state files for security

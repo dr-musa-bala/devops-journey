@@ -1,0 +1,27 @@
+---
+- name: Local Host Sanity Check
+  hosts: local
+  gather_facts: yes
+
+  tasks:
+    - name: Display system facts gathered by Ansible
+      debug:
+        msg: "Running on {{ ansible_distribution }} {{ ansible_distribution_version }} (Architecture: {{ ansible_architecture }})"
+
+    - name: Create a DevOps lab directory for Floci logs
+      file:
+        path: "{{ ansible_env.HOME }}/floci-ansible-lab"
+        state: directory
+        mode: '0755'
+
+    - name: Generate a test summary report
+      copy:
+        content: |
+          =========================================
+          ANSIBLE & FLOCI INTEGRATION TEST
+          =========================================
+          Managed Host: {{ ansible_hostname }}
+          OS: {{ ansible_distribution }}
+          Date Verified: {{ ansible_date_time.date }}
+          =========================================
+        dest: "{{ ansible_env.HOME }}/floci-ansible-lab/status.txt"

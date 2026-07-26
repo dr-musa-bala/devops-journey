@@ -1,0 +1,33 @@
+---
+- name: Ansible Control Flow & Floci Inspection
+  hosts: local
+  vars:
+    required_directories:
+      - "{{ ansible_env.HOME }}/floci-ansible-lab/configs"
+      - "{{ ansible_env.HOME }}/floci-ansible-lab/backups"
+      - "{{ ansible_env.HOME }}/floci-ansible-lab/logs"
+
+  tasks:
+    # 1. LOOP: Create multiple directories in a single task
+    - name: Create lab directory structure
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ required_directories }}"
+
+    # 2. REGISTER: Run a local command and save the raw terminal output
+    - name: Query active Docker containers on host
+      command: docker ps
+      register: docker_check
+      changed_when: false  # Tells Ansible this read-only command didn't alter system state
+
+    # 3. WHEN: Only run this task IF a specific container keyword exists
+    - name: Notify if Floci or LocalStack container is detected
+      debug:
+        msg: "🟢 Local AWS emulator container is actively running!"
+      when: "'floci' in docker_check.stdout or 'localstack' in docker_check.stdout or '4566' in docker_check.stdout"
+
+    - name: Display active running container names
+      debug:
+        msg: "{{ docker_check.stdout_lines }}"

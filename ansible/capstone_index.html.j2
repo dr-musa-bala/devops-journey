@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Capstone Stack - {{ ansible_hostname }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; color: #333; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .badge { background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🚀 Phase 6 Capstone Deployment</h1>
+        <p><strong>Status:</strong> <span class="badge">HEALTHY</span></p>
+        <hr>
+        <p><strong>Managed Node Hostname:</strong> {{ ansible_hostname }}</p>
+        <p><strong>Operating System:</strong> {{ ansible_distribution }} {{ ansible_distribution_version }}</p>
+        <p><strong>Container Engine:</strong> Docker on Linux</p>
+        <p><strong>Active Service Port:</strong> {{ stack_port }}</p>
+        <p><strong>Deployment Engineer:</strong> {{ engineer_name }}</p>
+        <p><strong>Deployment Timestamp:</strong> {{ ansible_date_time.iso8601 }}</p>
+    </div>
+</body>
+</html>

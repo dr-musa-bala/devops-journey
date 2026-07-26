@@ -1,0 +1,7 @@
+---
+env_name: "Production Role Architecture (Floci)"
+app_port: 8080
+enabled_features:
+  - "Ansible Role Modularization"
+  - "Automated Directory Resolution"
+  - "Enterprise Directory Standards"
