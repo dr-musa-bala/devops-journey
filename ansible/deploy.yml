@@ -1,0 +1,8 @@
+---
+- name: Minimal Ansible Execution
+  hosts: localhost         # Target host directly
+  connection: local        # Skips inventory.ini requirement
+
+  tasks:
+    - name: Ensure Nginx is running
+      command: docker run -d -p 80:80 nginx
