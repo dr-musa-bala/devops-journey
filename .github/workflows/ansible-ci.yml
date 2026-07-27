@@ -1,0 +1,22 @@
+name: Phase 7 - Ansible CI Workflow
+
+on:
+  push:
+    branches: [ "feature/*", "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    name: Run Ansible Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Run Ansible syntax check
+        run: |
+          echo "Validating Ansible playbook syntax on GitHub Runner..."
+          ansible-playbook ansible/deploy.yml --syntax-check
