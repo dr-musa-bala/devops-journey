@@ -50,6 +50,6 @@ jobs:
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
           docker stop devops-app || true
           docker rm devops-app || true
-          docker run -d --name devops-app -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
+          docker run -d --name devops-app -p 9090:80 ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
           docker ps | grep devops-app
           echo "Local deployment complete!"
