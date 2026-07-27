@@ -7,16 +7,32 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+# Environment variables accessible to ALL jobs in this workflow
+env:
+  DEPLOY_ENV: "staging"
+  ANSIBLE_FORCE_COLOR: "1"
+
 jobs:
   lint-and-test:
-    name: Run Ansible Syntax Check
+    name: Run Ansible Syntax & Secret Check
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4
 
+      - name: Verify Environment & Injected Secret
+        env:
+          # Inject the encrypted GitHub Secret safely as an environment variable
+          MY_API_KEY: ${{ secrets.STAGING_API_KEY }}
+        run: |
+          echo "Target Environment: $DEPLOY_ENV"
+          echo "Testing secret injection..."
+          
+          # GitHub will mask this value as *** in the log outputs
+          echo "Secret value length: ${#MY_API_KEY} characters"
+          echo "Direct printed secret: $MY_API_KEY"
+
       - name: Run Ansible syntax check
         run: |
-          echo "Validating Ansible playbook syntax on GitHub Runner..."
           ansible-playbook ansible/deploy.yml --syntax-check
