@@ -148,3 +148,107 @@ jobs:
 4. **Merge Strategy:** Once status checks turn green, merge PR into `main` to trigger registry publishing (`docker.io/musabalaaudu/devops-journey:latest`).
 
 ---
+That is a clean **`HTTP/1.1 200 OK`** — your end-to-end continuous deployment pipeline is officially functional!
+
+Your setup now automatically handles the full software lifecycle:
+
+1. **CI (GitHub Cloud):** Code push triggers testing, builds the Docker image, and publishes it to Docker Hub.
+2. **CD (Local WSL Runner):** The self-hosted service picks up the signal, pulls the latest image, and deploys the container on port `9090` automatically.
+
+
+```
+
+# DevOps Journey: Automated CI/CD Pipeline Architecture
+
+## Overview
+This repository implements an automated Continuous Integration and Continuous Deployment (CI/CD) pipeline using **GitHub Actions**, **Docker Hub**, and a **Local Self-Hosted Runner** operating on WSL (Ubuntu).
+
+---
+
+## Architecture Flow Diagram
+
+
+```
+
+[ Local Dev / Feature Branch ]
+│
+▼ (Git Push & PR)
+[ GitHub Repository (main) ]
+│
+├──► 1. CI Stage (GitHub-Hosted Runner)
+│      ├── Run linting & unit tests
+│      ├── Build Docker image
+│      └── Push to Docker Hub (`musabalaaudu/devops-journey:latest`)
+│
+└──► 2. CD Stage (Local Self-Hosted Runner)
+├── GitHub Actions triggers local system daemon (`svc.sh`)
+├── Pull latest Docker image from Docker Hub
+├── Remove old container (`devops-app`)
+└── Spin up container bound to `http://localhost:9090`
+
+---
+
+## Pipeline Specification (`.github/workflows/docker-ci.yml`)
+
+### Job 1: `build-and-push` (Continuous Integration)
+* **Runner Environment:** `ubuntu-latest` (GitHub-hosted)
+* **Trigger:** Pushes and merged Pull Requests to `main`
+* **Key Steps:**
+  1. Checkout source code.
+  2. Log in to Docker Hub using secrets (`DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`).
+  3. Build container image and push tag `latest`.
+
+### Job 2: `deploy` (Continuous Deployment)
+* **Runner Environment:** `self-hosted` (Local WSL Instance)
+* **Prerequisites:** Depends on successful `build-and-push` completion.
+* **Key Steps:**
+  1. Pull `musabalaaudu/devops-journey:latest` from Docker Hub.
+  2. Stop and remove existing `devops-app` container if present.
+  3. Launch container with port mapping `-p 9090:80`.
+  4. Verify container process status (`docker ps`).
+
+---
+
+## Local Self-Hosted Runner Configuration
+
+* **Runner Directory:** `~/devops-journey/actions-runner`
+* **Service Management Commands:**
+
+```
+
+bash
+
+# Check background runner daemon status
+
+sudo ./svc.sh status
+
+# Start/Stop service
+
+sudo ./svc.sh start
+sudo ./svc.sh stop
+
+```
+
+---
+
+## Verification & Health Check
+
+To test the live local deployment directly after a successful pipeline run:
+
+
+```
+
+bash
+curl -I http://localhost:9090
+
+```
+
+Expected Output:
+
+```
+
+http
+HTTP/1.1 200 OK
+Server: nginx
+
+```
