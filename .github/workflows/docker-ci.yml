@@ -31,24 +31,46 @@ jobs:
     runs-on: self-hosted
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Deploy Container Locally
+      - name: Deploy Container with Automated Rollback
         run: |
-          echo "Starting continuous deployment to local environment..."
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
-          docker stop devops-app || true
-          docker rm devops-app || true
-          docker run -d --name devops-app -p 9090:80 ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
-          docker ps | grep devops-app
+          echo "Starting continuous deployment with automated rollback support..."
 
-      - name: Post-Deployment Smoke Test
-        run: |
+          # 1. Back up existing running container if present
+          if docker ps -a --format '{{.Names}}' | grep -q "^devops-app$"; then
+            echo "Backing up current active container to devops-app-backup..."
+            docker stop devops-app || true
+            docker rm -f devops-app-backup || true
+            docker rename devops-app devops-app-backup
+          fi
+
+          # 2. Pull and start new container
+          echo "Pulling latest image and starting container..."
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
+          docker run -d --name devops-app -p 9090:80 ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
+
+          # 3. Health check verification
           echo "Waiting 5 seconds for application startup..."
           sleep 5
-          echo "Testing http://localhost:9090..."
-          if curl -s --head http://localhost:9090 | grep "200 OK"; then
-            echo "SUCCESS: Container is active and responding with HTTP 200 OK!"
+
+          if curl -s --head http://localhost:9090 | grep -q "200 OK"; then
+            echo "SUCCESS: Health check passed (HTTP 200 OK)."
+            echo "Cleaning up backup container..."
+            docker rm -f devops-app-backup || true
           else
-            echo "ERROR: Health check failed! Dumping container logs:"
+            echo "ERROR: Health check failed!"
+            echo "Dumping container logs:"
             docker logs devops-app
+            
+            echo "Initiating automated rollback..."
+            docker rm -f devops-app || true
+            
+            if docker ps -a --format '{{.Names}}' | grep -q "^devops-app-backup$"; then
+              docker rename devops-app-backup devops-app
+              docker start devops-app
+              echo "ROLLBACK COMPLETE: Restored previous working container."
+            else
+              echo "WARNING: No backup container found to restore."
+            fi
+            
             exit 1
           fi
