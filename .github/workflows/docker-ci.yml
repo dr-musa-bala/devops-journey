@@ -60,10 +60,10 @@ jobs:
             echo "ERROR: Health check failed!"
             echo "Dumping container logs:"
             docker logs devops-app
-            
+
             echo "Initiating automated rollback..."
             docker rm -f devops-app || true
-            
+
             if docker ps -a --format '{{.Names}}' | grep -q "^devops-app-backup$"; then
               docker rename devops-app-backup devops-app
               docker start devops-app
@@ -71,6 +71,6 @@ jobs:
             else
               echo "WARNING: No backup container found to restore."
             fi
-            
+
             exit 1
           fi
