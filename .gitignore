@@ -12,4 +12,5 @@
 
 # Ignore system files
 .DS_Store
-Thumbs.db
+Thumbs.dbactions-runner/
+actions-runner/
