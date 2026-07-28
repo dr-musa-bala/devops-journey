@@ -1,19 +1,16 @@
-name: Phase 7 - Docker Build, Push, and Deploy CD
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   build-and-push:
-    name: Build & Push Docker Image
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
@@ -22,27 +19,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
 
   deploy:
-    name: Continuous Deployment to Remote Host
     needs: build-and-push
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: self-hosted
-
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy Container Locally
         run: |
@@ -52,4 +39,16 @@ jobs:
           docker rm devops-app || true
           docker run -d --name devops-app -p 9090:80 ${{ secrets.DOCKERHUB_USERNAME }}/devops-journey:latest
           docker ps | grep devops-app
-          echo "Local deployment complete!"
+
+      - name: Post-Deployment Smoke Test
+        run: |
+          echo "Waiting 5 seconds for application startup..."
+          sleep 5
+          echo "Testing http://localhost:9090..."
+          if curl -s --head http://localhost:9090 | grep "200 OK"; then
+            echo "SUCCESS: Container is active and responding with HTTP 200 OK!"
+          else
+            echo "ERROR: Health check failed! Dumping container logs:"
+            docker logs devops-app
+            exit 1
+          fi
