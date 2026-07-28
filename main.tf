@@ -134,7 +134,7 @@ output "bucket_name" {
 
 # 🪣 The Central S3 Storage Bucket for State Files (Fully Active!)
 resource "aws_s3_bucket" "state_storage" {
-  bucket        = "musa-devops-sillypets-state-bucket-local"
+  bucket = "musa-devops-sillypets-state-bucket-local"
   #force_destroy = true
 }
 
