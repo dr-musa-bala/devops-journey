@@ -2,55 +2,30 @@ name: Sanity & Smoke Test
 
 on:
   push:
-    branches: [ "main", "feat/*" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   smoke-test-job:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Step 1 - Download Repository Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Step 2 - Check Runner System Info
-        run: |
-          echo "=========================================="
-          echo "Running on OS: $(uname -a)"
-          echo "Current Directory: $(pwd)"
-          echo "=========================================="
-
-      - name: Step 3 - Verify Repository Files
-        run: |
-          echo "Listing all files in repository:"
-          ls -la
-
-      - name: Step 4 - Verify Python Installation
-        run: |
-          echo "Checking if Python 3 is available on the runner:"
-          python3 --version
-
-# -------------------------------------------------------------
-      # Cache Trivy Vulnerability DB (Speeds up scans by 2-3 mins)
-      # -------------------------------------------------------------
-      - name: Cache Trivy Vulnerability Database
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/trivy
-          key: ${{ runner.os }}-trivy-db-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-trivy-db-
-# 1. Build your local image (already in your workflow)
       - name: Build Docker Image
         run: docker build -t sillypets-app:latest .
+
+      - name: Export Docker image to tarball
+        run: docker save sillypets-app:latest -o sillypets-app.tar
+
       # -------------------------------------------------------------
       # Aqua Security Trivy Vulnerability Scan
       # -------------------------------------------------------------
-- name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          input: 'sillypets-app.tar'    # <-- Scans the tar archive directly
+          input: 'sillypets-app.tar'
           format: 'table'
           exit-code: '0'
           ignore-unfixed: true
