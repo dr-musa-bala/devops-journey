@@ -31,7 +31,7 @@ jobs:
           echo "Checking if Python 3 is available on the runner:"
           python3 --version
 
-# -------------------------------------------------------------
+      # -------------------------------------------------------------
       # Cache Trivy Vulnerability DB (Speeds up scans by 2-3 mins)
       # -------------------------------------------------------------
       - name: Cache Trivy Vulnerability Database
@@ -41,13 +41,15 @@ jobs:
           key: ${{ runner.os }}-trivy-db-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-trivy-db-
-# 1. Build your local image (already in your workflow)
+      # 1. Build your local image (already in your workflow)
       - name: Build Docker Image
         run: docker build -t sillypets-app:latest .
+      - name: Export Docker image to tarball
+        run: docker save sillypets-app:latest -o sillypets-app.tar
       # -------------------------------------------------------------
       # Aqua Security Trivy Vulnerability Scan
       # -------------------------------------------------------------
-- name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           input: 'sillypets-app.tar'    # <-- Scans the tar archive directly
