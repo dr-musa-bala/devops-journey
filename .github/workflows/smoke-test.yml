@@ -35,7 +35,7 @@ jobs:
       # -------------------------------------------------------------
       - name: Send Discord Notification
         if: always()
-        uses: svenstaro/discord-action@v2
+        uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           message: |
