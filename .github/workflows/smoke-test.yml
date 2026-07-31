@@ -30,3 +30,18 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
+       # -------------------------------------------------------------
+      # Discord Notification
+      # -------------------------------------------------------------
+      - name: Send Discord Notification
+        if: always()
+        uses: svenstaro/discord-action@v2
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          message: |
+            📢 **Smoke Test Pipeline Run Complete**
+            • **Status:** `${{ job.status }}`
+            • **Branch:** `${{ github.ref_name }}`
+            • **Commit:** `${{ github.event.head_commit.message }}`
+            • **Repository:** `${{ github.repository }}` 
+
