@@ -15,7 +15,7 @@ services:
 
   # Tier 2: The Front-End Web Application
   web:
-    image: nginx:alpine
+    image: musabalaaudu/sillypets-image:V1.0
     container_name: sillypets-frontend-web
     ports:
       - "8082:80"
@@ -24,11 +24,24 @@ services:
     depends_on:
       - db # Forces Docker to wait until the database is up before launching the web layer
 
-# Permanent disk storage so your database data doesn't disappear when containers stop
+  # Tier 3: Continuous Monitoring Watchdog
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
+    networks:
+      - sillypets-net
+
+# Permanent disk storage so your data doesn't disappear when containers stop
 volumes:
   pgdata:
+  uptime-kuma-data:
 
-# The private network mesh connecting the two tiers together
+# The private network mesh connecting all tiers together
 networks:
   sillypets-net:
     driver: bridge
