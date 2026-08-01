@@ -30,6 +30,30 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
+      # -------------------------------------------------------------
+      # Container Health Check Verification
+      # -------------------------------------------------------------
+      - name: Spin Up Test Container
+        run: docker run -d --name app-smoke-test -p 8000:80 sillypets-app:latest
+
+      - name: Poll Health Endpoint
+        run: |
+          echo "Polling container health endpoint on port 8000..."
+          for i in {1..10}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/ || true)
+            echo "Attempt $i: Received HTTP $STATUS"
+            if [ "$STATUS" -eq 200 ]; then
+              echo "✅ Application health check passed!"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "❌ Health check timed out or returned invalid status ($STATUS)"
+          exit 1
+
+      - name: Cleanup Test Container
+        if: always()
+        run: docker rm -f app-smoke-test || true  
        # -------------------------------------------------------------
       # Discord Notification
       # -------------------------------------------------------------
