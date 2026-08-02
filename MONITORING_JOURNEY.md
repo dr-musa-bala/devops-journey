@@ -25,7 +25,6 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
 
 ### 3. Complete Declarative Stack (`docker-compose.yml`)
 
-```yaml
 services:
   # Tier 1: The Relational Database System
   db:
@@ -73,8 +72,6 @@ networks:
   sillypets-net:
     driver: bridge
 
-```
-
 ---
 
 ### 4. Incident & Troubleshooting Ledger (Compose Phase)
@@ -85,26 +82,21 @@ networks:
 * **Root Cause:** Volume naming mismatch. The standalone CLI used volume name `uptime-kuma`, whereas Docker Compose automatically scoped the volume as `<project_folder>_uptime-kuma-data` (`devops-journey_uptime-kuma-data`). Since the volume was brand new, Uptime Kuma initialized an empty SQLite database.
 * **Resolution:** Re-initialized the admin account and recreated the HTTP monitor targeting internal DNS (`http://web:80/`). *(Alternative fix: Map external volume using `external: true` in Compose).*
 
----
-
 ### 5. Verification Commands & Operational State
 
-```bash
+
 # Spin up all 3 tiers in background mode
 docker compose up -d
 
 # Verify container operational state
 docker compose ps
 
-```
-
 * **Application Status:** `http://localhost:8082` (`HTTP 200 OK`)
 * **Uptime Kuma Dashboard:** `http://localhost:3001`
 * **Target Monitored Endpoint:** `http://web:80/`
 * **Internal Resolution:** `sillypets-net` bridge mesh
 * **Operational Health:** **UP (GREEN 🟢)**
-```
----
+
 ## 7. Phase 8.3: Simulated Outage & Alert Verification
 
 ### 1. Incident Simulation Objective
@@ -137,15 +129,12 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
   > **Target:** `http://web:80/`  
   > **Ping:** `~2ms`  
 
----
 
 ### 4. Critical Technical Lessons Learned
 
 1. **Embedded DNS Healing:** If container alias resolution fails across bridge networks, cycling the stack with `docker compose down && docker compose up -d` forces Docker's internal DNS resolver (`127.0.0.11`) to re-index all service endpoints on `sillypets-net`.
 2. **Watchdog Health:** A monitoring tool can only alert if it is alive. Setting `restart: always` on the `uptime-kuma` service ensures the watchdog automatically recovers if the host reboots or crashes.
 3. **Threshold Tuning:** Configuring a `20-second` heartbeat interval and `1` max retry count gives near-instant incident response without overwhelming alert channels with noise.
-
----
 
 ### 📸 Visual Verification & Proof
 
