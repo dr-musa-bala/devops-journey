@@ -121,11 +121,14 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
   ```text
   http://web:80/
 ```
----
+
+
 ### 3. Complete Declarative Stack (`docker-compose.yml`)
 
+
 services:
-  # Tier 1: The Relational Database System
+ # Tier 1: The Relational Database System
+```
   db:
     image: postgres:15-alpine
     container_name: sillypets-backend-db
@@ -137,8 +140,9 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - sillypets-net
-
+```
   # Tier 2: The Front-End Web Application
+```
   web:
     image: musabalaaudu/sillypets-image:V1.0
     container_name: sillypets-frontend-web
@@ -148,9 +152,10 @@ services:
       - sillypets-net
     depends_on:
       - db # Ensures database launches prior to web layer
-
+```
   # Tier 3: Continuous Monitoring Watchdog
-  uptime-kuma:
+ ```
+ uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: uptime-kuma
     restart: always
@@ -160,18 +165,19 @@ services:
       - uptime-kuma-data:/app/data
     networks:
       - sillypets-net
-
+```
 # Permanent disk storage across container restarts
+```
 volumes:
   pgdata:
   uptime-kuma-data:
-
+```
 # Private network mesh connecting all tiers
+```
 networks:
   sillypets-net:
     driver: bridge
-
----
+```
 
 ### 4. Incident & Troubleshooting Ledger (Compose Phase)
 
@@ -180,7 +186,7 @@ networks:
 * **Symptom:** Opening `http://localhost:3001` displayed the initial setup screen instead of the existing login page.
 * **Root Cause:** Volume naming mismatch. The standalone CLI used volume name `uptime-kuma`, whereas Docker Compose automatically scoped the volume as `<project_folder>_uptime-kuma-data` (`devops-journey_uptime-kuma-data`). Since the volume was brand new, Uptime Kuma initialized an empty SQLite database.
 * **Resolution:** Re-initialized the admin account and recreated the HTTP monitor targeting internal DNS (`http://web:80/`). *(Alternative fix: Map external volume using `external: true` in Compose).*
-```
+
 ### 5. Verification Commands & Operational State
 
 
