@@ -119,12 +119,11 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
 * **New Method (Docker Compose):** All three services sit on a user-defined bridge network (`sillypets-net`). Docker’s embedded DNS engine automatically resolves service names. Uptime Kuma now monitors:
   ```text
   http://web:80/
-```
----
+
 
 ### 3. Complete Declarative Stack (`docker-compose.yml`)
 
-```yaml
+```
 services:
   # Tier 1: The Relational Database System
   db:
@@ -238,4 +237,3 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 ![Discord Outage and Recovery Notifications](./images/discord_alert.png)
 
 
-#dfd
