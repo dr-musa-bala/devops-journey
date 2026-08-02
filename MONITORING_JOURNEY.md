@@ -120,10 +120,9 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
   ```text
   http://web:80/
 
-
+---
 ### 3. Complete Declarative Stack (`docker-compose.yml`)
 
-```
 services:
   # Tier 1: The Relational Database System
   db:
@@ -138,7 +137,7 @@ services:
     networks:
       - sillypets-net
 
-  # Tier 2: The Front-End Web Application
+# Tier 2: The Front-End Web Application
   web:
     image: musabalaaudu/sillypets-image:V1.0
     container_name: sillypets-frontend-web
@@ -149,7 +148,7 @@ services:
     depends_on:
       - db # Ensures database launches prior to web layer
 
-  # Tier 3: Continuous Monitoring Watchdog
+# Tier 3: Continuous Monitoring Watchdog
   uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: uptime-kuma
