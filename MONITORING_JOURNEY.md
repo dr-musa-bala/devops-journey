@@ -51,7 +51,6 @@ During initial configuration, several connectivity and deployment issues were en
 * **Root Cause:** The application container (`sillypets-app`) was not actively running on the host machine; previous CI/CD checks ran on ephemeral GitHub Action runners.
 * **Resolution:** Spun up the target container locally to listen on host port `8000`.
 
----
 
 ### ❌ Issue 3: `Unable to find image 'sillypets-app:latest' locally`
 
@@ -122,8 +121,10 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
   http://web:80/
 ```
 ---
+
 ### 3. Complete Declarative Stack (`docker-compose.yml`)
 
+```yaml
 services:
   # Tier 1: The Relational Database System
   db:
@@ -171,16 +172,6 @@ networks:
   sillypets-net:
     driver: bridge
 
----
-
-### 4. Incident & Troubleshooting Ledger (Compose Phase)
-
-#### ❌ Issue 1: Uptime Kuma Prompted to Create Account Again After `docker compose up`
-
-* **Symptom:** Opening `http://localhost:3001` displayed the initial setup screen instead of the existing login page.
-* **Root Cause:** Volume naming mismatch. The standalone CLI used volume name `uptime-kuma`, whereas Docker Compose automatically scoped the volume as `<project_folder>_uptime-kuma-data` (`devops-journey_uptime-kuma-data`). Since the volume was brand new, Uptime Kuma initialized an empty SQLite database.
-* **Resolution:** Re-initialized the admin account and recreated the HTTP monitor targeting internal DNS (`http://web:80/`). *(Alternative fix: Map external volume using `external: true` in Compose).*
-```
 ### 5. Verification Commands & Operational State
 
 
@@ -245,3 +236,6 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 #### 2. Discord Real-Time Alert Delivery
 
 ![Discord Outage and Recovery Notifications](./images/discord_alert.png)
+
+
+#dfd
