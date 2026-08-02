@@ -1,6 +1,3 @@
-# Draft Addition for `MONITORING_JOURNEY.md`
-
-```markdown
 ## 6. Phase 8.2: Infrastructure as Code (IaC) with Docker Compose
 
 ### 1. Architectural Evolution
