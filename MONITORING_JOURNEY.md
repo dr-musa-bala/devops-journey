@@ -103,7 +103,6 @@ docker compose ps
 ### 1. Incident Simulation Objective
 Verify the full end-to-end observability and alerting pipeline under synthetic failure conditions using the multi-container Docker Compose architecture on `sillypets-net`.
 
----
 
 ### 2. Test Execution Timeline & Results
 
@@ -115,10 +114,8 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 | **4. Trigger Recovery** | `docker compose start web` | The `web` container boots up. The next heartbeat ping returns `HTTP 200 OK`. | **RECOVERED (GREEN 🟢)** |
 | **5. Discord Recovery** | Automatic Webhook | Uptime Kuma fires a resolution payload confirming service restoration. | **RESOLVED ALERT SENT 🟢** |
 
----
-
 ### 3. Alert Payloads Captured
-
+```
 * **Down Alert Received:**
   > 🔴 **[DOWN] Sillypets App**  
   > **Target:** `http://web:80/`  
@@ -128,7 +125,7 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
   > 🟢 **[UP] Sillypets App**  
   > **Target:** `http://web:80/`  
   > **Ping:** `~2ms`  
-
+```
 ---
 
 ### 4. Critical Technical Lessons Learned
