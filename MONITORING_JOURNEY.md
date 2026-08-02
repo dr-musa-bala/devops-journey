@@ -108,6 +108,7 @@ docker compose ps
 ## 7. Phase 8.3: Simulated Outage & Alert Verification
 
 ### 1. Incident Simulation Objective
+
 Verify the full end-to-end observability and alerting pipeline under synthetic failure conditions using the multi-container Docker Compose architecture on `sillypets-net`.
 
 ---
@@ -144,12 +145,16 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 2. **Watchdog Health:** A monitoring tool can only alert if it is alive. Setting `restart: always` on the `uptime-kuma` service ensures the watchdog automatically recovers if the host reboots or crashes.
 3. **Threshold Tuning:** Configuring a `20-second` heartbeat interval and `1` max retry count gives near-instant incident response without overwhelming alert channels with noise.
 
+---
+
 ### 📸 Visual Verification & Proof
 
 #### 1. Uptime Kuma Status Dashboard
+
 | Outage State (Red) | Recovery State (Green) |
 | :---: | :---: |
-![Uptime Kuma Down](./images/kuma_down.png) | ![Uptime Kuma Up](./images/kuma_up.png) |
+| ![Uptime Kuma Down](./images/kuma_down.png) | ![Uptime Kuma Up](./images/kuma_up.png) |
 
 #### 2. Discord Real-Time Alert Delivery
+
 ![Discord Outage and Recovery Notifications](./images/discord_alert.png)
