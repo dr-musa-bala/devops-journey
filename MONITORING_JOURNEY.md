@@ -20,7 +20,7 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
 
 ### 3. Complete Declarative Stack (`docker-compose.yml`)
 
-```yaml
+```
 services:
   # Tier 1: The Relational Database System
   db:
