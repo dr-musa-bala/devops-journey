@@ -106,5 +106,43 @@ docker compose ps
 * **Target Monitored Endpoint:** `http://web:80/`
 * **Internal Resolution:** `sillypets-net` bridge mesh
 * **Operational Health:** **UP (GREEN 🟢)**
-
 ```
+---
+## 7. Phase 8.3: Simulated Outage & Alert Verification
+
+### 1. Incident Simulation Objective
+Verify the full end-to-end observability and alerting pipeline under synthetic failure conditions using the multi-container Docker Compose architecture on `sillypets-net`.
+
+---
+
+### 2. Test Execution Timeline & Results
+
+| Step / Action | Command / Trigger | Internal System Behavior | Dashboard & Alert Status |
+| :--- | :--- | :--- | :--- |
+| **1. Normal Baseline** | `docker compose up -d` | `sillypets-backend-db`, `sillypets-frontend-web`, and `uptime-kuma` running smoothly. | **UP (GREEN 🟢)** |
+| **2. Trigger Outage** | `docker compose stop web` | The `web` container stops. Uptime Kuma's heartbeat ping to `http://web:80/` fails (`ECONNREFUSED`). | **DOWN (RED 🔴)** |
+| **3. Discord Notification** | Automatic Webhook | Uptime Kuma fires an instant HTTP POST payload to Discord. | **ALERT DELIVERED 🚨** |
+| **4. Trigger Recovery** | `docker compose start web` | The `web` container boots up. The next heartbeat ping returns `HTTP 200 OK`. | **RECOVERED (GREEN 🟢)** |
+| **5. Discord Recovery** | Automatic Webhook | Uptime Kuma fires a resolution payload confirming service restoration. | **RESOLVED ALERT SENT 🟢** |
+
+---
+
+### 3. Alert Payloads Captured
+
+* **Down Alert Received:**
+  > 🔴 **[DOWN] Sillypets App**  
+  > **Target:** `http://web:80/`  
+  > **Error:** `connect ECONNREFUSED`  
+
+* **Recovery Alert Received:**
+  > 🟢 **[UP] Sillypets App**  
+  > **Target:** `http://web:80/`  
+  > **Ping:** `~2ms`  
+
+---
+
+### 4. Critical Technical Lessons Learned
+
+1. **Embedded DNS Healing:** If container alias resolution fails across bridge networks, cycling the stack with `docker compose down && docker compose up -d` forces Docker's internal DNS resolver (`127.0.0.11`) to re-index all service endpoints on `sillypets-net`.
+2. **Watchdog Health:** A monitoring tool can only alert if it is alive. Setting `restart: always` on the `uptime-kuma` service ensures the watchdog automatically recovers if the host reboots or crashes.
+3. **Threshold Tuning:** Configuring a `20-second` heartbeat interval and `1` max retry count gives near-instant incident response without overwhelming alert channels with noise.
