@@ -1,4 +1,4 @@
-## 6. Phase 8.2: Infrastructure as Code (IaC) with Docker Compose
+# 6. Phase 8.2: Infrastructure as Code (IaC) with Docker Compose
 
 ### 1. Architectural Evolution
 
@@ -11,7 +11,6 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
 | **Tier 3 (Observability)**| `uptime-kuma` | `3001:3001` | Out-of-band monitoring & alerting watchdog |
 
 ---
-
 ### 2. Service Discovery vs. IP Hacks
 
 * **Old Method (Standalone CLI):** Uptime Kuma had to target the host bridge IP (`http://172.17.0.1:8000/`) because containers on the default Docker bridge cannot resolve each other by container name.
@@ -19,13 +18,9 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
   ```text
   http://web:80/
 
-```
-
----
-
 ### 3. Complete Declarative Stack (`docker-compose.yml`)
 
-```yaml
+```
 services:
   # Tier 1: The Relational Database System
   db:
@@ -75,8 +70,6 @@ networks:
 
 ```
 
----
-
 ### 4. Incident & Troubleshooting Ledger (Compose Phase)
 
 #### ❌ Issue 1: Uptime Kuma Prompted to Create Account Again After `docker compose up`
@@ -104,14 +97,13 @@ docker compose ps
 * **Internal Resolution:** `sillypets-net` bridge mesh
 * **Operational Health:** **UP (GREEN 🟢)**
 ```
----
+
 ## 7. Phase 8.3: Simulated Outage & Alert Verification
 
 ### 1. Incident Simulation Objective
 
 Verify the full end-to-end observability and alerting pipeline under synthetic failure conditions using the multi-container Docker Compose architecture on `sillypets-net`.
 
----
 
 ### 2. Test Execution Timeline & Results
 
@@ -123,10 +115,8 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 | **4. Trigger Recovery** | `docker compose start web` | The `web` container boots up. The next heartbeat ping returns `HTTP 200 OK`. | **RECOVERED (GREEN 🟢)** |
 | **5. Discord Recovery** | Automatic Webhook | Uptime Kuma fires a resolution payload confirming service restoration. | **RESOLVED ALERT SENT 🟢** |
 
----
-
 ### 3. Alert Payloads Captured
-
+```
 * **Down Alert Received:**
   > 🔴 **[DOWN] Sillypets App**  
   > **Target:** `http://web:80/`  
@@ -136,7 +126,7 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
   > 🟢 **[UP] Sillypets App**  
   > **Target:** `http://web:80/`  
   > **Ping:** `~2ms`  
-
+```
 ---
 
 ### 4. Critical Technical Lessons Learned
