@@ -123,11 +123,16 @@ To eliminate manual container management and hardcoded IP routing (`172.17.0.1`)
 
 * **Old Method (Standalone CLI):** Uptime Kuma had to target the host bridge IP (`http://172.17.0.1:8000/`) because containers on the default Docker bridge cannot resolve each other by container name.
 * **New Method (Docker Compose):** All three services sit on a user-defined bridge network (`sillypets-net`). Docker’s embedded DNS engine automatically resolves service names. Uptime Kuma now monitors:
-  ```text
-  http://web:80/
 ```
+<<<<<<< Updated upstream
 ### 3. Complete Declarative Stack (`docker-compose.yml`)
 ```
+=======
+  http://web:80/
+
+### 3. Complete Declarative Stack (`docker-compose.yml`)
+
+>>>>>>> Stashed changes
 services:
   # Tier 1: The Relational Database System
   db:
@@ -171,6 +176,7 @@ volumes:
   uptime-kuma-data:
 
 # Private network mesh connecting all tiers
+
 networks:
   sillypets-net:
     driver: bridge
@@ -251,3 +257,8 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 #### 2. Discord Real-Time Alert Delivery
 
 ![Discord Outage and Recovery Notifications](./images/discord_alert.png)
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
