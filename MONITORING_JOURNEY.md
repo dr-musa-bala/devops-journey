@@ -146,3 +146,13 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 1. **Embedded DNS Healing:** If container alias resolution fails across bridge networks, cycling the stack with `docker compose down && docker compose up -d` forces Docker's internal DNS resolver (`127.0.0.11`) to re-index all service endpoints on `sillypets-net`.
 2. **Watchdog Health:** A monitoring tool can only alert if it is alive. Setting `restart: always` on the `uptime-kuma` service ensures the watchdog automatically recovers if the host reboots or crashes.
 3. **Threshold Tuning:** Configuring a `20-second` heartbeat interval and `1` max retry count gives near-instant incident response without overwhelming alert channels with noise.
+
+### 📸 Visual Verification & Proof
+
+#### 1. Uptime Kuma Status Dashboard
+| Outage State (Red) | Recovery State (Green) |
+| :---: | :---: |
+| ![Uptime Kuma Down](images/kuma_down.png) | ![Uptime Kuma Up](images/kuma_up.png) |
+
+#### 2. Discord Real-Time Alert Delivery
+![Discord Outage and Recovery Notifications](images/discord_alert.png)
