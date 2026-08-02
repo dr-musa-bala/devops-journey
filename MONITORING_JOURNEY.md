@@ -152,7 +152,7 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 #### 1. Uptime Kuma Status Dashboard
 | Outage State (Red) | Recovery State (Green) |
 | :---: | :---: |
-| ![Uptime Kuma Down](images/kuma_down.png) | ![Uptime Kuma Up](images/kuma_up.png) |
+![Uptime Kuma Down](./images/kuma_down.png) | ![Uptime Kuma Up](./images/kuma_up.png) |
 
 #### 2. Discord Real-Time Alert Delivery
-![Discord Outage and Recovery Notifications](images/discord_alert.png)
+![Discord Outage and Recovery Notifications](./images/discord_alert.png)
