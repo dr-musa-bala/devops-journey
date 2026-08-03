@@ -1,4 +1,3 @@
-
 services:
   # Tier 1: The Relational Database System
   db:
@@ -22,7 +21,7 @@ services:
     networks:
       - sillypets-net
     depends_on:
-      - db # Forces Docker to wait until the database is up before launching the web layer
+      - db
 
   # Tier 3: Continuous Monitoring Watchdog
   uptime-kuma:
@@ -36,10 +35,74 @@ services:
     networks:
       - sillypets-net
 
+  # Metrics Exporter: Collects CPU, RAM & I/O from Docker containers
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /var/run:/var/run:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys:/sys:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    ports:
+      - "8080:8080"
+    networks:
+      - sillypets-net
+    restart: always
+
+  # Time-Series Database: Stores performance metrics over time
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - sillypets-net
+    restart: always
+
+  # Visual Dashboards: Renders graphs for metrics
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=SuperSecurePassword123
+    networks:
+      - sillypets-net
+    restart: always
+
+  # Stage 6: Continuous Integration & Automation Server
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: jenkins
+    privileged: true
+    user: root
+    ports:
+      - "8081:8080"  # Mapped to 8081 to avoid conflict with cAdvisor on 8080
+      - "50000:50000" # Agent communication port
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # Grants Jenkins ability to build Docker images
+    networks:
+      - sillypets-net
+    restart: always
+
 # Permanent disk storage so your data doesn't disappear when containers stop
 volumes:
   pgdata:
   uptime-kuma-data:
+  prometheus_data:
+  grafana_data:
+  jenkins_data:
 
 # The private network mesh connecting all tiers together
 networks:
