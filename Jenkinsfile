@@ -49,7 +49,7 @@ pipeline {
 
     post {
         always {
-            # Navigated Issue #3: Safe lifecycle teardown
+  
             echo "--> Cleaning up test container artifacts..."
             sh "docker stop test-sillypets || true"
             sh "docker rm test-sillypets || true"
