@@ -7,6 +7,8 @@ pipeline {
         IMAGE_TAG       = "${env.BUILD_NUMBER}"
         CONTAINER_NAME  = 'sillypets-live'
         APP_PORT        = '5000'
+        // Paste your Discord/Slack Webhook URL here or store it in Jenkins Credentials
+        WEBHOOK_URL     = 'https://discord.com/api/webhooks/1532589693160390768/nwvj7fBWaLpwsutCj2yakmhEvZJFrSqPtqWhXdxgI6QMEtcJcJDnSu4KGw491Ns1nsHb'
     }
 
     stages {
@@ -40,11 +42,8 @@ pipeline {
         stage('Deploy Container (CD)') {
             steps {
                 script {
-                    // Stop and remove existing container if running
                     sh "docker stop ${CONTAINER_NAME} || true"
                     sh "docker rm ${CONTAINER_NAME} || true"
-
-                    // Pull fresh image and run
                     sh "docker pull ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
                     sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:80 ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
                 }
@@ -55,6 +54,24 @@ pipeline {
     post {
         always {
             sh "docker logout"
+        }
+
+        success {
+            sh """
+                curl -H "Content-Type: application/json" \
+                     -X POST \
+                     -d '{"content": "✅ **Jenkins Build #${env.BUILD_NUMBER} SUCCESS**\\n**Job:** ${env.JOB_NAME}\\n**Status:** Deployed to http://localhost:${APP_PORT}"}' \
+                     ${WEBHOOK_URL}
+            """
+        }
+
+        failure {
+            sh """
+                curl -H "Content-Type: application/json" \
+                     -X POST \
+                     -d '{"content": "🚨 **Jenkins Build #${env.BUILD_NUMBER} FAILED**\\n**Job:** ${env.JOB_NAME}\\n**Console Logs:** ${env.BUILD_URL}console"}' \
+                     ${WEBHOOK_URL}
+            """
         }
     }
 }
