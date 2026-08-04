@@ -387,3 +387,157 @@ git push origin main
 
 * `dr-musa-bala/sillypets:18`
 * `dr-musa-bala/sillypets:latest`
+---
+
+# Jenkins CI/CD Automated Pipeline & Discord Notification Documentation
+
+## 1. Executive Summary & Architecture Overview
+
+This document logs the end-to-end continuous integration and continuous deployment (CI/CD) pipeline for the `sillypets-ci` application (`devops-journey` repository). It details GitHub webhook event handling, Docker automated image builds, registry publishing, deployment automation, and real-time Discord notification alerts for build states.
+
+### Full Pipeline Flow
+
+```
+[ Feature Branch / PR ] ──► [ GitHub Webhook ] ──► [ ngrok Tunnel ] ──► [ Jenkins Server ]
+                                                                                │
+   ┌────────────────────────────────────────────────────────────────────────────┴────────────────────────────────────────────┐
+   │ 1. Checkout SCM (refs/pull/* or main)                                                                                  │
+   │ 2. Build Docker Image (${BUILD_NUMBER} & latest)                                                                       │
+   │ 3. Authenticate & Push to Docker Hub                                                                                   │
+   │ 4. Deploy Container to Port 5000 (`docker run`)                                                                        │
+   └────────────────────────────────────────────────────────────────────────────┬────────────────────────────────────────────┘
+                                                                                │
+                                                   ┌────────────────────────────┴────────────────────────────┐
+                                                   ▼                                                         ▼
+                                       [ ✅ Success Webhook ]                                    [ 🚨 Failure Webhook ]
+                                                   │                                                         │
+                                                   └────────────────────────────┬────────────────────────────┘
+                                                                                ▼
+                                                                  [ Discord #general Channel ]
+
+```
+
+---
+
+## 2. Notification Pipeline Configuration (`Jenkinsfile`)
+
+Real-time notification hooks are embedded inside the `post` execution block of the `Jenkinsfile`, delivering status updates directly to Discord via incoming webhooks.
+
+```groovy
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB_USER = 'musabalaaudu'
+        IMAGE_NAME      = 'sillypets'
+        IMAGE_TAG       = "${env.BUILD_NUMBER}"
+        CONTAINER_NAME  = 'sillypets-live'
+        APP_PORT        = '5000'
+        WEBHOOK_URL     = 'https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ."
+                    sh "docker tag ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
+                        sh "docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+                        sh "docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Container (CD)') {
+            steps {
+                script {
+                    sh "docker stop ${CONTAINER_NAME} || true"
+                    sh "docker rm ${CONTAINER_NAME} || true"
+                    sh "docker pull ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:80 ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh "docker logout"
+        }
+
+        success {
+            sh """
+                curl -H "Content-Type: application/json" \
+                     -X POST \
+                     -d '{"content": "✅ **Jenkins Build #${env.BUILD_NUMBER} SUCCESS**\\n**Job:** ${env.JOB_NAME}\\n**Status:** Deployed to http://localhost:${APP_PORT}/"}' \
+                     ${WEBHOOK_URL}
+            """
+        }
+
+        failure {
+            sh """
+                curl -H "Content-Type: application/json" \
+                     -X POST \
+                     -d '{"content": "🚨 **Jenkins Build #${env.BUILD_NUMBER} FAILED**\\n**Job:** ${env.JOB_NAME}\\n**Console Logs:** ${env.BUILD_URL}console"}' \
+                     ${WEBHOOK_URL}
+            """
+        }
+    }
+}
+
+```
+
+---
+
+## 3. Real-World Execution & Discord Verification Proof
+
+### Test Case A: Build #22 — Success & Automated Deployment Alert
+
+* **Trigger:** GitHub `pull_request` (#62) merge event into `refs/heads/main` (Commit: `52b539b`).
+* **Job:** `sillypets-ci`
+* **Result:** **SUCCESS**
+* **Deployment Target:** `http://localhost:5000/`
+* **Discord Alert Payload Verified:** `✅ Jenkins Build #22 SUCCESS | Status: Deployed to http://localhost:5000/`
+
+---
+
+### Test Case B: Build #23 — Synthetic Failure Alert
+
+* **Trigger:** Synthetic failure test introduced on PR #63 (`refs/pull/63/merge`).
+* **Job:** `sillypets-ci`
+* **Result:** **FAILED**
+* **Console Log Link:** `http://localhost:8081/job/sillypets-ci/23/console`
+* **Discord Alert Payload Verified:** `🚨 Jenkins Build #23 FAILED | Console Logs: http://localhost:8081/job/sillypets-ci/23/console`
+
+---
+
+## 4. Summary of Verification Achievements
+
+1. **Pull Request Automation:** Verified that Jenkins receives both `pull_request` preview triggers (`refs/pull/XX/merge`) and `push` triggers on `main`.
+2. **Discord Success Hook Delivery:** Verified Build #22 automatically builds, publishes to Docker Hub, deploys to port 5000, and fires the green Discord webhook notification.
+
+### Build #22 Success Alert
+![Discord Build #22 Success Alert](./images/alert_discord_cicd.png)
+
+3. **Discord Failure Hook Delivery:** Verified Build #23 catches errors in the pipeline, aborts deployment, logs output, and fires the red failure webhook notification with direct console links.
+
+### Build #23 Failure Alert
+![Discord Build #23 Failure Alert](./images/induce_failure_discord.png)
+
+---
