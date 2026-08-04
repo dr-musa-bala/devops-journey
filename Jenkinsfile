@@ -62,5 +62,4 @@ pipeline {
         }
     }
 }
-#testing
-#// Webhook automatic build test
+//testing
