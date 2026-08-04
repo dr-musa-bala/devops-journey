@@ -2,9 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER = 'musabalaaudu' // <-- Update this
+        DOCKER_HUB_USER = 'musabalaaudu'
         IMAGE_NAME      = 'sillypets'
         IMAGE_TAG       = "${env.BUILD_NUMBER}"
+        CONTAINER_NAME  = 'sillypets-live'
+        APP_PORT        = '5000'
     }
 
     stages {
@@ -31,6 +33,20 @@ pipeline {
                         sh "docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
                         sh "docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
                     }
+                }
+            }
+        }
+
+        stage('Deploy Container (CD)') {
+            steps {
+                script {
+                    // Stop and remove existing container if running
+                    sh "docker stop ${CONTAINER_NAME} || true"
+                    sh "docker rm ${CONTAINER_NAME} || true"
+
+                    // Pull fresh image and run
+                    sh "docker pull ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:80 ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest"
                 }
             }
         }
