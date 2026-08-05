@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sillypets-pod
+  labels:
+    app: sillypets
+spec:
+  containers:
+  - name: sillypets-container
+    image: musabalaaudu/sillypets:latest
+    ports:
+    - containerPort: 80

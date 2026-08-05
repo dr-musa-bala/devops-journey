@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sillypets-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sillypets
+  template:
+    metadata:
+      labels:
+        app: sillypets
+    spec:
+      containers:
+      - name: sillypets-container
+        image: musabalaaudu/sillypets:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
