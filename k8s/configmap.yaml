@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sillypets-config
+spec:
+data:
+  APP_TITLE: "Silly Pets Gallery"
+  APP_COLOR: "coral"
