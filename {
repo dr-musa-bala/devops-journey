@@ -1,0 +1,83 @@
+Script started on 2026-08-04 22:31:43+03:00 [TERM="xterm-256color" TTY="/dev/pts/6" COLUMNS="48" LINES="16"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ 
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ dockerr[K ps --fil ter "name=sillypets-live
+[?2004l[?2004h> 
+[?2004l[?2004h> "
+[?2004lCONTAINER ID   IMAGE                           COMMAND                  CREATED         STATUS         PORTS                                     NAMES
+c5a99caf1707   musabalaaudu/sillypets:latest   "nginx -g 'daemon of…"   4 minutes ago   Up 4 minutes   0.0.0.0:5000->80/tcp, [::]:5000->80/tcp   sillypets-live
+[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ git add index.h tml
+[?2004l[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ git co [Kmmit -m " feat"[K: update hompe[K[Kepage title"
+[?2004l[feature/add-deploy-docker 2a619af] feat: update homepage title
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ p[Kgith pu[K[K[K[K[Kt psuh[K[K[Kush
+[?2004lfatal: The current branch feature/add-deploy-docker has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream origin feature/add-deploy-docker
+
+To have this happen automatically for branches without a tracking
+upstream, see 'push.autoSetupRemote' in 'git help config'.
+
+[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ git push orign[K[Kgin  feature/add-deploy-docker
+[?2004lEnumerating objects: 5, done.
+Counting objects:  20% (1/5)Counting objects:  40% (2/5)Counting objects:  60% (3/5)Counting objects:  80% (4/5)Counting objects: 100% (5/5)Counting objects: 100% (5/5), done.
+Delta compression using up to 16 threads
+Compressing objects:  33% (1/3)Compressing objects:  66% (2/3)Compressing objects: 100% (3/3)Compressing objects: 100% (3/3), done.
+Writing objects:  33% (1/3)Writing objects:  66% (2/3)Writing objects: 100% (3/3)Writing objects: 100% (3/3), 315 bytes | 315.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas:   0% (0/2)[Kremote: Resolving deltas:  50% (1/2)[Kremote: Resolving deltas: 100% (2/2)[Kremote: Resolving deltas: 100% (2/2), completed with 2 local objects.[K
+To https://github.com/dr-musa-bala/devops-journey.git
+   361a73c..2a619af  feature/add-deploy-docker -> feature/add-deploy-docker
+[?2004h]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@DRMUSA: ~/devops-journey[01;32mdr-musa@DRMUSA[00m:[01;34m~/devops-journey[00m$ [K]0;dr-musa@D
