@@ -275,3 +275,61 @@ Navigate to your repository on GitHub:
 1. **Shift-Left Quality Control:** Catching syntax errors and malformed YAML via `helm lint` before code reaches production or live environments.
 2. **Automated Artifact Generation:** Eliminating manual `helm package` commands by generating versioned `.tgz` releases automatically in CI.
 3. **Template Validation:** Testing placeholder evaluation (`helm template`) dynamically in ephemeral GitHub runners.
+
+## GitHub Actions CI/CD & OCI Publishing
+
+### Workflow Manifest (.github/workflows/helm-ci.yaml)
+```yaml
+name: Helm CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "module-11-helm", "module-12-cicd" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  lint-package-publish:
+    name: Lint, Package, and Publish to GHCR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+
+      - name: Helm Lint Check
+        run: helm lint sillypets-chart/
+
+      - name: Dry-Run Template Test
+        run: helm template test-release sillypets-chart/ --debug
+
+      - name: Package Helm Chart
+        run: |
+          mkdir -p ./dist
+          helm package sillypets-chart/ --destination ./dist
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Chart to GHCR (OCI)
+        if: github.event_name == 'push'
+        run: |
+          PACKAGE_FILE=$(ls ./dist/*.tgz)
+          helm push ${PACKAGE_FILE} oci://ghcr.io/${{ github.repository_owner }}/helm-charts
+
+helm install sillypets-remote oci://ghcr.io/dr-musa-bala/helm-charts/sillypets-chart --version 0.1.0
+
