@@ -1,0 +1,15 @@
+replicaCount: 3
+
+image:
+  repository: musabalaaudu/sillypets
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30080
+
+config:
+  appTitle: "Silly Pets Gallery (Helm Powered)"
+  appColor: "coral"
