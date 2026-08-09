@@ -18,11 +18,11 @@ spec:
         summary: "High memory usage on pod {{ `{{ $labels.pod }}` }}"
         description: "Pod {{ `{{ $labels.pod }}` }} is consuming over 50 MB of memory (current value: {{ `{{ $value }}` }} bytes)."
 
-    - alert: SillypetsPodRestarted
-      expr: sum(increase(kube_pod_container_status_restarts_total{namespace="default", pod=~"sillypets.*"}[15m])) by (pod) > 0
-      for: 0m
+    - alert: SillypetsHighMemoryUsage
+      expr: sum(container_memory_working_set_bytes{namespace="default", pod=~"sillypets.*"}) by (pod) > 1
+      for: 0s
       labels:
-        severity: critical
+        severity: warning
       annotations:
-        summary: "Pod {{ `{{ $labels.pod }}` }} restarted"
-        description: "Pod {{ `{{ $labels.pod }}` }} in namespace default restarted in the last 15 minutes."
+        summary: "Sillypets pod high memory usage"
+        description: "Pod memory usage is above 1 byte threshold."
