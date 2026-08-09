@@ -18,7 +18,7 @@ spec:
   receivers:
   - name: 'slack-notifications'
     slackConfigs:
-    - apiUrl:
+    - apiURL:
         key: api-url
         name: slack-webhook-secret
       channel: '#devops-alerts'
