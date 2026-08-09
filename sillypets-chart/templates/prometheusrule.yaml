@@ -15,8 +15,8 @@ spec:
       labels:
         severity: warning
       annotations:
-        summary: "High memory usage on pod {{ $labels.pod }}"
-        description: "Pod {{ $labels.pod }} is consuming over 50 MB of memory (current value: {{ $value }} bytes)."
+        summary: "High memory usage on pod {{ `{{ $labels.pod }}` }}"
+        description: "Pod {{ `{{ $labels.pod }}` }} is consuming over 50 MB of memory (current value: {{ `{{ $value }}` }} bytes)."
 
     - alert: SillypetsPodRestarted
       expr: sum(increase(kube_pod_container_status_restarts_total{namespace="default", pod=~"sillypets.*"}[15m])) by (pod) > 0
@@ -24,5 +24,5 @@ spec:
       labels:
         severity: critical
       annotations:
-        summary: "Pod {{ $labels.pod }} restarted"
-        description: "Pod {{ $labels.pod }} in namespace default restarted in the last 15 minutes."
+        summary: "Pod {{ `{{ $labels.pod }}` }} restarted"
+        description: "Pod {{ `{{ $labels.pod }}` }} in namespace default restarted in the last 15 minutes."
