@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sillypets-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus-stack
+spec:
+  groups:
+  - name: sillypets.alerts
+    rules:
+    - alert: SillypetsHighMemoryUsage
+      expr: sum(container_memory_working_set_bytes{namespace="default", pod=~"sillypets.*"}) by (pod) > 50000000
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High memory usage on pod {{ $labels.pod }}"
+        description: "Pod {{ $labels.pod }} is consuming over 50 MB of memory (current value: {{ $value }} bytes)."
+
+    - alert: SillypetsPodRestarted
+      expr: sum(increase(kube_pod_container_status_restarts_total{namespace="default", pod=~"sillypets.*"}[15m])) by (pod) > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Pod {{ $labels.pod }} restarted"
+        description: "Pod {{ $labels.pod }} in namespace default restarted in the last 15 minutes."
