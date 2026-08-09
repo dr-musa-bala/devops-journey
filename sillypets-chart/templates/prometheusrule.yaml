@@ -10,7 +10,7 @@ spec:
   - name: sillypets.alerts
     rules:
     - alert: SillypetsHighMemoryUsage
-      expr: sum(container_memory_working_set_bytes{namespace="default", pod=~"sillypets.*"}) by (pod) > 10000000
+      expr: sum(container_memory_working_set_bytes{namespace="default", pod=~"sillypets.*"}) by (pod) > 1000000
       for: 2m
       labels:
         severity: warning
