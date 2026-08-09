@@ -23,9 +23,5 @@ spec:
       apiUrl:
         name: slack-webhook-secret
         key: api-url
-      title: '{{ `[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}` }}'
-      text: >-
-        *Alert:* {{ `{{ .CommonAnnotations.summary }}` }}
-        *Description:* {{ `{{ .CommonAnnotations.description }}` }}
-        *Severity:* {{ `{{ .CommonLabels.severity }}` }}
-        *Pod:* {{ `{{ .CommonLabels.pod }}` }}
+      title: '{{ `[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}` }}'
+      text: '{{ `*Alert:* {{ .CommonAnnotations.summary }} | *Description:* {{ .CommonAnnotations.description }} | *Severity:* {{ .CommonLabels.severity }} | *Pod:* {{ .CommonLabels.pod }}` }}'
