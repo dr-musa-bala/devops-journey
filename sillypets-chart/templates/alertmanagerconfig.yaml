@@ -18,10 +18,10 @@ spec:
   receivers:
   - name: 'slack-notifications'
     slackConfigs:
-    - channel: '#devops-alerts'
-      sendResolved: true
-      apiUrl:
-        name: slack-webhook-secret
+    - apiUrl:
         key: api-url
+        name: slack-webhook-secret
+      channel: '#devops-alerts'
+      sendResolved: true
       title: '{{ `[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}` }}'
       text: '{{ `*Alert:* {{ .CommonAnnotations.summary }} | *Description:* {{ .CommonAnnotations.description }} | *Severity:* {{ .CommonLabels.severity }} | *Pod:* {{ .CommonLabels.pod }}` }}'
