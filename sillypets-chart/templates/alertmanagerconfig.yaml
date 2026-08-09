@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: sillypets-slack-config
+  namespace: monitoring
+  labels:
+    release: prometheus-stack
+spec:
+  route:
+    groupBy: ['alertname', 'pod']
+    groupWait: 10s
+    groupInterval: 1m
+    repeatInterval: 1h
+    receiver: 'slack-notifications'
+    matchers:
+      - name: severity
+        value: warning
+  receivers:
+  - name: 'slack-notifications'
+    slackConfigs:
+    - channel: '#devops-alerts'
+      sendResolved: true
+      apiUrl:
+        name: slack-webhook-secret
+        key: api-url
+      title: '{{ `[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}` }}'
+      text: >-
+        *Alert:* {{ `{{ .CommonAnnotations.summary }}` }}
+        *Description:* {{ `{{ .CommonAnnotations.description }}` }}
+        *Severity:* {{ `{{ .CommonLabels.severity }}` }}
+        *Pod:* {{ `{{ .CommonLabels.pod }}` }}
