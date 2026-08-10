@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sillypets-grafana-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    release: prometheus-stack
+data:
+  sillypets-dashboard.json: |-
+    # Paste your exported JSON content here (indented under sillypets-dashboard.json)
