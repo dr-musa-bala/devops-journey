@@ -25,5 +25,5 @@ spec:
         severity: warning
         namespace: monitoring
       annotations:
-        summary: "High memory usage on pod {{ $labels.pod }}"
-        description: "Pod {{ $labels.pod }} is consuming over 50 MB of memory (current value: {{ $value }} bytes)."
+        summary: "High memory usage on pod {{ "{{" }} $labels.pod {{ "}}" }}"
+        description: "Pod {{ "{{" }} $labels.pod {{ "}}" }} is consuming over 50 MB of memory (current value: {{ "{{" }} $value {{ "}}" }} bytes)."
