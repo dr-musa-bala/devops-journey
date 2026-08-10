@@ -19,11 +19,11 @@ spec:
         description: "Pod {{ `{{ $labels.pod }}` }} is consuming over 50 MB of memory (current value: {{ `{{ $value }}` }} bytes)."
 
     - alert: SillypetsHighMemoryUsage
-      expr: sum(container_memory_working_set_bytes{namespace="default", pod=~"sillypets.*"}) by (pod) > 1
-      for: 0s
+      expr: sum(container_memory_working_set_bytes{namespace="default", pod=~"sillypets.*"}) by (pod) > 50000000
+      for: 2m
       labels:
         severity: warning
         namespace: monitoring
       annotations:
-        summary: "Sillypets pod high memory usage"
-        description: "Pod memory usage is above 1 byte threshold."
+        summary: "High memory usage on pod {{ $labels.pod }}"
+        description: "Pod {{ $labels.pod }} is consuming over 50 MB of memory (current value: {{ $value }} bytes)."
