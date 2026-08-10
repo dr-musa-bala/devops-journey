@@ -28,13 +28,13 @@ spec:
         summary: "High memory usage on pod {{ "{{" }} $labels.pod {{ "}}" }}"
         description: "Pod {{ "{{" }} $labels.pod {{ "}}" }} is consuming over 50 MB of memory (current value: {{ "{{" }} $value {{ "}}" }} bytes)."
     
-    # 2. CPU Usage Alert
+    # 2. CPU Usage Alert (TEST THRESHOLD: > 0.01, for: 0s)
     - alert: SillypetsHighCPUUsage
-      expr: sum(rate(container_cpu_usage_seconds_total{namespace="default", pod=~"sillypets.*", container!=""}[5m])) by (pod) > 0.8
-      for: 2m
+      expr: sum(rate(container_cpu_usage_seconds_total{namespace="default", pod=~"sillypets.*", container!=""}[1m])) by (pod) > 0.01
+      for: 0s
       labels:
         severity: warning
         namespace: monitoring
       annotations:
         summary: "High CPU usage on pod {{ "{{" }} $labels.pod {{ "}}" }}"
-        description: "Pod {{ "{{" }} $labels.pod {{ "}}" }} CPU usage is above 80% of a core over 5 minutes (current rate: {{ "{{" }} $value {{ "}}" }})."
+        description: "Pod {{ "{{" }} $labels.pod {{ "}}" }} CPU usage is high (current rate: {{ "{{" }} $value {{ "}}" }})."
