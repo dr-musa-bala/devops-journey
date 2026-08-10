@@ -23,6 +23,7 @@ spec:
       for: 0s
       labels:
         severity: warning
+        namespace: monitoring
       annotations:
         summary: "Sillypets pod high memory usage"
         description: "Pod memory usage is above 1 byte threshold."
