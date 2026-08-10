@@ -20,7 +20,7 @@ spec:
         summary: 'High memory usage on pod {{ "{{" }} $labels.pod {{ "}}" }}'
         description: 'Pod {{ "{{" }} $labels.pod {{ "}}" }} is consuming over 50 MB of memory (current value: {{ "{{" }} $value {{ "}}" }} bytes).'
 
-    # 2. CPU Usage Alert (Production Values)
+    # 2. CPU Usage Alert
     - alert: SillypetsHighCPUUsage
       expr: sum(rate(container_cpu_usage_seconds_total{pod=~"sillypets.*"}[5m])) by (pod) > 0.8
       for: 2m
@@ -30,3 +30,14 @@ spec:
       annotations:
         summary: 'High CPU usage on pod {{ "{{" }} $labels.pod {{ "}}" }}'
         description: 'Pod {{ "{{" }} $labels.pod {{ "}}" }} CPU usage is above 80% of a core over 5 minutes (current rate: {{ "{{" }} $value {{ "}}" }}).'
+
+    # 3. Pod CrashLoop / Restart Alert
+    - alert: SillypetsPodCrashLooping
+      expr: sum(increase(kube_pod_container_status_restarts_total{pod=~"sillypets.*"}[15m])) by (pod) > 2
+      for: 1m
+      labels:
+        severity: critical
+        namespace: monitoring
+      annotations:
+        summary: 'Pod {{ "{{" }} $labels.pod {{ "}}" }} is restarting frequently'
+        description: 'Pod {{ "{{" }} $labels.pod {{ "}}" }} has restarted more than 2 times in the last 15 minutes (restart increase: {{ "{{" }} $value {{ "}}" }}).'
