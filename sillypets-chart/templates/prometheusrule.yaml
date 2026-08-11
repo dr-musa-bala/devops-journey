@@ -36,7 +36,7 @@ spec:
       expr: sum(increase(kube_pod_container_status_restarts_total{pod=~"sillypets.*"}[15m])) by (pod) > 2
       for: 1m
       labels:
-        severity: critical
+        severity: warning
         namespace: monitoring
       annotations:
         summary: 'Pod {{ "{{" }} $labels.pod {{ "}}" }} is restarting frequently'

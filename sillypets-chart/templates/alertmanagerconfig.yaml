@@ -14,7 +14,8 @@ spec:
     receiver: 'slack-notifications'
     matchers:
       - name: severity
-        value: warning
+        value: "(warning|critical)"
+        matchType: "=~"
   receivers:
   - name: 'slack-notifications'
     slackConfigs:
