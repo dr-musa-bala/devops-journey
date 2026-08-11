@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sillypets-grafana-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  sillypets.json: |
+    {
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "id": 1,
+          "title": "CPU Usage (Cores)",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"sillypets-.*\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "id": 2,
+          "title": "Memory Working Set (Bytes)",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "sum(container_memory_working_set_bytes{pod=~\"sillypets-.*\"}) by (pod)",
+              "legendFormat": "{{pod}}"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "id": 3,
+          "title": "Pod Restart Count",
+          "type": "stat",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "expr": "kube_pod_container_status_restarts_total{pod=~\"sillypets-.*\"}",
+              "legendFormat": "{{pod}}"
+            }
+          ]
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": ["sillypets", "kubernetes"],
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "Sillypets Monitoring Dashboard",
+      "uid": "sillypets-dashboard",
+      "version": 1
+    }

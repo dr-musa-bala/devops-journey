@@ -236,3 +236,86 @@ Verify the full end-to-end observability and alerting pipeline under synthetic f
 ![Discord Outage and Recovery Notifications](./images/discord_alert.png)
 
 
+## Core Observability Runbook: Slack Alerting & Grafana Dashboards
+
+### 1. Direct Alertmanager Slack Integration (Secret-Based)
+
+Bypassing `AlertmanagerConfig` CRD sync issues by directly updating the core Alertmanager configuration secret ensures reliable, immediate notification delivery without operator reconciliation failures.
+
+* **Configuration Structure (`alertmanager.yaml`):** Group routing, severity matchers, and Slack receiver blocks must use proper syntax:
+```yaml
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['namespace', 'alertname', 'pod']
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 1h
+  receiver: 'slack-notifications'
+  routes:
+  - matchers:
+    - name: alertname
+      value: Watchdog
+    receiver: 'null'
+  - matchers:
+    - name: severity
+      value: "warning|critical"
+      regex: true
+    receiver: 'slack-notifications'
+
+receivers:
+- name: 'null'
+- name: 'slack-notifications'
+  slack_configs:
+  - api_url: 'YOUR_SLACK_WEBHOOK_URL'
+    channel: '#devops-alerts'
+    send_resolved: true
+    title: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}'
+    text: '*Alert:* {{ .CommonAnnotations.summary }} | *Description:* {{ .CommonAnnotations.description }} | *Severity:* {{ .CommonLabels.severity }} | *Pod:* {{ .CommonLabels.pod }}'
+
+```
+
+
+* **Secret Update & Reload Commands:**
+```bash
+kubectl create secret generic alertmanager-prometheus-stack-kube-prom-alertmanager \
+  --from-file=alertmanager.yaml=alertmanager-direct.yaml \
+  -n monitoring \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl rollout restart statefulset/alertmanager-prometheus-stack-kube-prom-alertmanager -n monitoring
+
+```
+
+
+
+---
+
+### 2. Automated Grafana Dashboard Provisioning via ConfigMaps
+
+Grafana sidecar containers automatically ingest, parse, and provision dashboards from ConfigMaps inside the monitoring namespace without requiring manual UI interventions or file uploads.
+
+* **Critical Discovery Label:** The ConfigMap **must** carry the label `grafana_dashboard: "1"` so the sidecar container discovers and mounts the definition.
+* **Strict JSON Integrity:** JSON payloads inside the `data` block must be completely free of inline comments (`#`) and syntax errors to prevent parser crashes (`invalid character '#' looking for beginning of value`).
+* **ConfigMap Deployment Pattern:**
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-grafana-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  dashboard.json: |
+    {
+      "annotations": { "list": [] },
+      "editable": true,
+      "panels": [],
+      "title": "Custom Monitoring Dashboard",
+      "uid": "custom-dashboard",
+      "version": 1
+    }
+
+```
